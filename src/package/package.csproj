@@ -8,6 +8,8 @@
     <TargetFrameworks>net46;netcoreapp1.0</TargetFrameworks>
     <AssemblyName>package</AssemblyName>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">$(PackageTargetFallback);dnxcore50;netstandardapp1.0;portable-net45+win8;portable-net45+wp80+win8+wpa81+dnxcore50</PackageTargetFallback>
+
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
@@ -17,6 +19,18 @@
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <GenerateNeutralResourcesLanguageAttribute>false</GenerateNeutralResourcesLanguageAttribute>
+
+    <!-- This proj file shouldn't create outputs during build or publish -->
+    <ResolvePackageDependenciesForBuild>false</ResolvePackageDependenciesForBuild>
+    <CopyBuildOutputToOutputDirectory>false</CopyBuildOutputToOutputDirectory>
+    <CopyOutputSymbolsToOutputDirectory>false</CopyOutputSymbolsToOutputDirectory>
+    <CopyBuildOutputToPublishDirectory>false</CopyBuildOutputToPublishDirectory>
+    <CopyOutputSymbolsToPublishDirectory>false</CopyOutputSymbolsToPublishDirectory>
+
+    <GenerateDependencyFile>false</GenerateDependencyFile>
+    <ResolvePackageDependenciesForBuild>false</ResolvePackageDependenciesForBuild>
+    <NonShipping>true</NonShipping>
+    <NoStdLib>true</NoStdLib>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' != 'netcoreapp1.0'">
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
@@ -28,20 +42,20 @@
     </Content>    
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Microsoft.TestPlatform.Client\Microsoft.TestPlatform.Client.csproj" />
-    <ProjectReference Include="..\Microsoft.TestPlatform.Common\Microsoft.TestPlatform.Common.csproj" />
-    <ProjectReference Include="..\Microsoft.TestPlatform.CommunicationUtilities\Microsoft.TestPlatform.CommunicationUtilities.csproj" />
-    <ProjectReference Include="..\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj" />
-    <ProjectReference Include="..\Microsoft.TestPlatform.CrossPlatEngine\Microsoft.TestPlatform.CrossPlatEngine.csproj" />
-    <ProjectReference Include="..\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />
-    <ProjectReference Include="..\vstest.console\vstest.console.csproj" />
-    <ProjectReference Include="..\Microsoft.TestPlatform.VsTestConsole.TranslationLayer\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.csproj" />
-    <ProjectReference Include="..\Microsoft.TestPlatform.Extensions.TrxLogger\Microsoft.TestPlatform.Extensions.TrxLogger.csproj" />
-    <ProjectReference Include="..\Microsoft.TestPlatform.Utilities\Microsoft.TestPlatform.Utilities.csproj">
-      <FromP2P>true</FromP2P>
-    </ProjectReference>
-  </ItemGroup>
+  <!--<ItemGroup>-->
+    <!--<ProjectReference Include="..\Microsoft.TestPlatform.Client\Microsoft.TestPlatform.Client.csproj" />-->
+    <!--<ProjectReference Include="..\Microsoft.TestPlatform.Common\Microsoft.TestPlatform.Common.csproj" />-->
+    <!--<ProjectReference Include="..\Microsoft.TestPlatform.CommunicationUtilities\Microsoft.TestPlatform.CommunicationUtilities.csproj" />-->
+    <!--<ProjectReference Include="..\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj" />-->
+    <!--<ProjectReference Include="..\Microsoft.TestPlatform.CrossPlatEngine\Microsoft.TestPlatform.CrossPlatEngine.csproj" />-->
+    <!--<ProjectReference Include="..\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />-->
+    <!--<ProjectReference Include="..\vstest.console\vstest.console.csproj" />-->
+    <!--<ProjectReference Include="..\Microsoft.TestPlatform.VsTestConsole.TranslationLayer\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.csproj" />-->
+    <!--<ProjectReference Include="..\Microsoft.TestPlatform.Extensions.TrxLogger\Microsoft.TestPlatform.Extensions.TrxLogger.csproj" />-->
+    <!--<ProjectReference Include="..\Microsoft.TestPlatform.Utilities\Microsoft.TestPlatform.Utilities.csproj">-->
+      <!--<FromP2P>true</FromP2P>-->
+    <!--</ProjectReference>-->
+  <!--</ItemGroup>-->
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
     <!--<PackageReference Include="Microsoft.Internal.TestPlatform.Extensions">
@@ -82,4 +96,6 @@
     </ItemGroup>
   </Target>-->
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
+
+  <Target Name="CoreCompile" />                               <!-- Prevent Csc from being called -->
 </Project>

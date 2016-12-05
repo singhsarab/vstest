@@ -243,6 +243,7 @@ function Publish-Package
 
 function Publish-PackageInternal($packagename, $framework, $output)
 {
+    Write-Log ".. Framework: $framework, Package: $packagename, Output: $output"
     Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal"
     & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal
 }
