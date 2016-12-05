@@ -229,6 +229,8 @@ function Publish-Package
     Publish-PackageInternal $trxloggerProject $TPB_TargetFramework $coreCLRExtensionsDir
 
     # Publish translation layer
+    Write-Log "Package: Publish src\Microsoft.TestPlatform.VsTestConsole.TranslationLayer\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.csproj"
+    Publish-PackageInternal $translationLayerProject $TPB_TargetFramework $fullCLRPackageDir
 
     # Note Note: If there are some dependencies for the logger assemblies, those need to be moved too. 
     # Ideally we should just be publishing the loggers to the Extensions folder.
