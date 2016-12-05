@@ -175,9 +175,10 @@ function Publish-Package
     $vstestConsoleProject = Join-Path $env:TP_ROOT_DIR "src\vstest.console\vstest.console.csproj"
     $dataCollectorProject = Join-Path $env:TP_ROOT_DIR "src\datacollector\datacollector.csproj"
     $dataCollectorx86Project = Join-Path $env:TP_ROOT_DIR "src\datacollector.x86\datacollector.x86.csproj"
+    $trxloggerProject = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.Extensions.TrxLogger\Microsoft.TestPlatform.Extensions.TrxLogger.csproj"
+    $translationLayerProject = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.VsTestConsole.TranslationLayer\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.csproj"
 
     Write-Log "Package: Publish package\*.csproj"
-	
     Publish-PackageInternal $packageProject $TPB_TargetFramework $fullCLRPackageDir
     Publish-PackageInternal $packageProject $TPB_TargetFrameworkCore $coreCLRPackageDir
 
@@ -214,7 +215,7 @@ function Publish-Package
         Set-ScriptFailed
     }
 
-    # Copy over the logger assemblies to the Extensions folder.
+    # Publish logger
     $extensions_Dir = "Extensions"
     $fullCLRExtensionsDir = Join-Path $fullCLRPackageDir $extensions_Dir
     $coreCLRExtensionsDir = Join-Path $coreCLRPackageDir $extensions_Dir
@@ -223,16 +224,22 @@ function Publish-Package
     New-Item -ItemType directory -Path $fullCLRExtensionsDir -Force | Out-Null
     New-Item -ItemType directory -Path $coreCLRExtensionsDir -Force | Out-Null
 
+    Write-Log "Package: Publish src\Microsoft.TestPlatform.Extensions.TrxLogger\Microsoft.TestPlatform.Extensions.TrxLogger.csproj"
+    Publish-PackageInternal $trxloggerProject $TPB_TargetFramework $fullCLRExtensionsDir
+    Publish-PackageInternal $trxloggerProject $TPB_TargetFramework $coreCLRExtensionsDir
+
+    # Publish translation layer
+
     # Note Note: If there are some dependencies for the logger assemblies, those need to be moved too. 
     # Ideally we should just be publishing the loggers to the Extensions folder.
-    $loggers = @("Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.dll", "Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.pdb")
-    foreach($file in $loggers) {
-        Write-Verbose "Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force"
-        Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force
+    #$loggers = @("Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.dll", "Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.pdb")
+    #foreach($file in $loggers) {
+        #Write-Verbose "Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force"
+        #Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force
 		
-        Write-Verbose "Move-Item $coreCLRPackageDir\$file $coreCLRExtensionsDir -Force"
-        Move-Item $coreCLRPackageDir\$file $coreCLRExtensionsDir -Force
-    }
+        #Write-Verbose "Move-Item $coreCLRPackageDir\$file $coreCLRExtensionsDir -Force"
+        #Move-Item $coreCLRPackageDir\$file $coreCLRExtensionsDir -Force
+    #}
 
     # For libraries that are externally published, copy the output into artifacts. These will be signed and packaged independently.
     Copy-PackageItems "Microsoft.TestPlatform.Build"
