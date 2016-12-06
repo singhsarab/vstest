@@ -231,6 +231,7 @@ function Publish-Package
     # Publish translation layer
     Write-Log "Package: Publish src\Microsoft.TestPlatform.VsTestConsole.TranslationLayer\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.csproj"
     Publish-PackageInternal $translationLayerProject $TPB_TargetFramework $fullCLRPackageDir
+    Publish-PackageInternal $translationLayerProject $TPB_TargetFrameworkCore $coreCLRPackageDir
 
     # Note Note: If there are some dependencies for the logger assemblies, those need to be moved too. 
     # Ideally we should just be publishing the loggers to the Extensions folder.
@@ -254,7 +255,7 @@ function Publish-PackageInternal($packagename, $framework, $output)
 {
     Write-Log ".. Framework: $framework, Package: $packagename, Output: $output"
     Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal"
-    & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal
+    & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:diag
 }
 
 function Create-VsixPackage
@@ -421,13 +422,13 @@ Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | 
 Write-Log "Test platform build variables: "
 Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
 
-Install-DotNetCli
-Restore-Package
+#Install-DotNetCli
+#Restore-Package
 #Update-LocalizedResources
-Invoke-Build
+#Invoke-Build
 Publish-Package
-Create-VsixPackage
-Create-NugetPackages
+#Create-VsixPackage
+#Create-NugetPackages
 
 Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
 
