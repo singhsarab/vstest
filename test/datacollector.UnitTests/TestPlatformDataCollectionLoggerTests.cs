@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         public void Init()
         {
             messageSink = new Mock<IMessageSink>();
-            this.dataCollectorConfig = new DataCollectorConfig(typeof(CustomDataCollector), string.Empty);
+            this.dataCollectorConfig = new DataCollectorConfig(typeof(CustomDataCollector));
             this.logger = new TestPlatformDataCollectionLogger(this.messageSink.Object, this.dataCollectorConfig);
 
             Guid guid = Guid.NewGuid();

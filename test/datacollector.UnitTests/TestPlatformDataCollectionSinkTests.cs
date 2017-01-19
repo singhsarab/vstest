@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         public void Init()
         {
             this.attachmentManager = new Mock<IDataCollectionAttachmentManager>();
-            this.dataCollectorConfig = new DataCollectorConfig(typeof(CustomDataCollector), string.Empty);
+            this.dataCollectorConfig = new DataCollectorConfig(typeof(CustomDataCollector));
             this.dataCollectionSink = new TestPlatformDataCollectionSink(this.attachmentManager.Object, this.dataCollectorConfig);
             this.isEventHandlerInvoked = false;
         }
@@ -77,7 +77,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
             FileTransferInformation fileTransferInfo = new FileTransferInformation(context, filename, false);
 
             var attachmentManager = new DataCollectionAttachmentManager();
-            attachmentManager.Initialize(sessionId, AppContext.BaseDirectory, new Mock<IDataCollectionLog>().Object);
+            attachmentManager.Initialize(sessionId, AppContext.BaseDirectory, new Mock<IMessageSink>().Object);
 
             this.dataCollectionSink = new TestPlatformDataCollectionSink(attachmentManager, this.dataCollectorConfig);
             this.dataCollectionSink.SendFileCompleted += SendFileCompleted_Handler;

@@ -153,4 +153,7 @@
   <data name="WrongDataCollectionContextType" xml:space="preserve">
     <value>Types deriving from the data collection context cannot be used for sending data and messages.  The DataCollectionContext used for sending data and messages must come from one of the events raised to the data collector.</value>
   </data>
+  <data name="FriendlyNameIsNullOrEmpty" xml:space="preserve">
+    <value>Diagnostic data adapter friendly names cannot be null or empty. The friendly name for the diagnostic data adapter of type '{0}' is null or empty.</value>
+  </data>
 </root>

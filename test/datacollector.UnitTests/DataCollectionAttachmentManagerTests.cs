@@ -19,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
     public class DataCollectionFileManagerTests
     {
         DataCollectionAttachmentManager attachmentManager;
-        Mock<IDataCollectionLog> dataCollectionLog;
+        Mock<IMessageSink> messageSink;
         SessionId sessionId;
 
 
@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         public void Init()
         {
             this.attachmentManager = new DataCollectionAttachmentManager();
-            this.dataCollectionLog = new Mock<IDataCollectionLog>();
+            this.messageSink = new Mock<IMessageSink>();
             var guid = Guid.NewGuid();
             this.sessionId = new SessionId(guid);
 
@@ -43,25 +43,25 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         [TestMethod]
         public void InitializeShouldThrowExceptionIfSessionIdIsNull()
         {
-            Assert.ThrowsException<ArgumentNullException>((Action)(() =>
+            Assert.ThrowsException<ArgumentNullException>(() =>
             {
-                this.attachmentManager.Initialize((SessionId)null, string.Empty, this.dataCollectionLog.Object);
-            }));
+                this.attachmentManager.Initialize((SessionId)null, string.Empty, this.messageSink.Object);
+            });
         }
 
         [TestMethod]
-        public void InitializeShouldThrowExceptionIfDataCollectionLogIsNull()
+        public void InitializeShouldThrowExceptionIfMessageSinkIsNull()
         {
-            Assert.ThrowsException<ArgumentNullException>((Action)(() =>
+            Assert.ThrowsException<ArgumentNullException>(() =>
             {
                 this.attachmentManager.Initialize(this.sessionId, string.Empty, null);
-            }));
+            });
         }
 
         [TestMethod]
         public void InitializeShouldSetDefaultPathIfOutputDirectoryPathIsNull()
         {
-            this.attachmentManager.Initialize(this.sessionId, string.Empty, this.dataCollectionLog.Object);
+            this.attachmentManager.Initialize(this.sessionId, string.Empty, this.messageSink.Object);
 
             Assert.AreEqual(this.attachmentManager.SessionOutputDirectory, Path.Combine(Path.GetTempPath(), "TestResults", this.sessionId.Id.ToString()));
         }
@@ -69,7 +69,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         [TestMethod]
         public void InitializeShouldSetCorrectGuidAndOutputPath()
         {
-            this.attachmentManager.Initialize(this.sessionId, System.AppContext.BaseDirectory, this.dataCollectionLog.Object);
+            this.attachmentManager.Initialize(this.sessionId, System.AppContext.BaseDirectory, this.messageSink.Object);
 
             Assert.IsNotNull(this.attachmentManager.AttachmentRequests);
             Assert.AreEqual(0, this.attachmentManager.AttachmentRequests.Count);
@@ -100,7 +100,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
             File.WriteAllText(Path.Combine(AppContext.BaseDirectory, filename), string.Empty);
 
 
-            this.attachmentManager.Initialize(this.sessionId, AppContext.BaseDirectory, dataCollectionLog.Object);
+            this.attachmentManager.Initialize(this.sessionId, AppContext.BaseDirectory, messageSink.Object);
 
             var datacollectioncontext = new DataCollectionContext(sessionId);
             var friendlyName = "TestDataCollector";
@@ -126,7 +126,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
             File.WriteAllText(Path.Combine(AppContext.BaseDirectory, filename), string.Empty);
 
 
-            this.attachmentManager.Initialize(this.sessionId, System.AppContext.BaseDirectory, this.dataCollectionLog.Object);
+            this.attachmentManager.Initialize(this.sessionId, System.AppContext.BaseDirectory, this.messageSink.Object);
 
             var datacollectioncontext = new DataCollectionContext(this.sessionId);
             var friendlyName = "TestDataCollector";
@@ -150,9 +150,10 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         [TestMethod]
         public void AddAttachmentShouldNotAddNewFileTransferIfNullIsPassed()
         {
-            this.attachmentManager.AddAttachment(null);
-
-            Assert.AreEqual(this.attachmentManager.AttachmentRequests.Count, 0);
+            Assert.ThrowsException<ArgumentNullException>(()=>
+            {
+                this.attachmentManager.AddAttachment(null);
+            });
         }
 
         [TestMethod]
@@ -161,7 +162,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
             var filename = "filename1.txt";
             File.WriteAllText(Path.Combine(AppContext.BaseDirectory, filename), string.Empty);
 
-            this.attachmentManager.Initialize(this.sessionId, AppContext.BaseDirectory, this.dataCollectionLog.Object);
+            this.attachmentManager.Initialize(this.sessionId, AppContext.BaseDirectory, this.messageSink.Object);
 
             var datacollectioncontext = new DataCollectionContext(this.sessionId);
             var friendlyName = "TestDataCollector";
@@ -187,7 +188,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
             var filename = "filename1.txt";
             File.WriteAllText(Path.Combine(AppContext.BaseDirectory, filename), string.Empty);
 
-            this.attachmentManager.Initialize(this.sessionId, AppContext.BaseDirectory, this.dataCollectionLog.Object);
+            this.attachmentManager.Initialize(this.sessionId, AppContext.BaseDirectory, this.messageSink.Object);
 
             var datacollectioncontext = new DataCollectionContext(this.sessionId);
 
@@ -201,7 +202,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
             var filename = "filename1.txt";
             File.WriteAllText(Path.Combine(AppContext.BaseDirectory, filename), string.Empty);
 
-            this.attachmentManager.Initialize(this.sessionId, AppContext.BaseDirectory, this.dataCollectionLog.Object);
+            this.attachmentManager.Initialize(this.sessionId, AppContext.BaseDirectory, this.messageSink.Object);
 
             var datacollectioncontext = new DataCollectionContext(this.sessionId);
             var friendlyName = "TestDataCollector";

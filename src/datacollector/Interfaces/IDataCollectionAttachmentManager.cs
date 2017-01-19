@@ -1,5 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+﻿
 
 namespace Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces
 {
@@ -10,7 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
     /// <summary>
-    /// The DataCollectionFileManager interface.
+    /// The DataCollectionAttachmentManager Interface.
     /// </summary>
     internal interface IDataCollectionAttachmentManager : IDisposable
     {
@@ -23,10 +22,10 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces
         /// <param name="outputDirectory">
         /// The output directory.
         /// </param>
-        /// <param name="dataCollectionLog">
-        /// The data collection log.
+        /// <param name="messageSink">
+        /// The message Sink.
         /// </param>
-        void Initialize(SessionId id, string outputDirectory, IDataCollectionLog dataCollectionLog);
+        void Initialize(SessionId id, string outputDirectory, IMessageSink messageSink);
 
         /// <summary>
         /// Gets attachment sets associated with given collection context.

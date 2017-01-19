@@ -44,7 +44,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             this.sink = sink;
         }
 
-
         /// <inheritdoc/>
         public override void LogError(DataCollectionContext context, string text)
         {

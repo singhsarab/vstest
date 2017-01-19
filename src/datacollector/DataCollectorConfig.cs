@@ -26,24 +26,17 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// <param name="dataCollectorConfig">
         /// The data collector config.
         /// </param>
-        public DataCollectorConfig(Type type, string dataCollectorConfig)
+        public DataCollectorConfig(Type type)
         {
             this.DataCollectorType = type;
-            this.DataCollectorConfiguration = dataCollectorConfig;
             this.TypeUri = GetTypeUri(type);
-
-            // todo : initialize FriendlyName.
+            this.FriendlyName = GetFriendlyName(type);
         }
 
         /// <summary>
         /// Gets the data collector type.
         /// </summary>
         public Type DataCollectorType { get; private set; }
-
-        /// <summary>
-        /// Gets the data collector configuration.
-        /// </summary>
-        public string DataCollectorConfiguration { get; private set; }
 
         /// <summary>
         /// Gets the type uri.
@@ -87,6 +80,32 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             }
 
             return typeUri;
+        }
+
+        /// <summary>
+        /// Gets the friendly name for the data collector.
+        /// </summary>
+        /// <param name="dataCollectorType">The data collector to get the Type URI for.</param>
+        /// <returns>Friendly name of the data collector.</returns>
+        private static string GetFriendlyName(Type dataCollectorType)
+        {
+            Debug.Assert(dataCollectorType != null, "null dataCollectorType");
+
+            // Get the friendly name from the attribute.
+            var friendlyNameAttributes = GetAttributes(
+                dataCollectorType,
+                typeof(DataCollectorFriendlyNameAttribute),
+                true);
+
+            var friendlyNameAttribute = (DataCollectorFriendlyNameAttribute)friendlyNameAttributes[0];
+
+            // Verify that the friendly name provided is not null or empty.
+            if (string.IsNullOrEmpty(friendlyNameAttribute.FriendlyName))
+            {
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.FriendlyNameIsNullOrEmpty, dataCollectorType.FullName));
+            }
+
+            return friendlyNameAttribute.FriendlyName;
         }
 
         /// <summary>

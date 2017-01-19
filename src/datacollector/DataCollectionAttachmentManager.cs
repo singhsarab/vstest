@@ -53,7 +53,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// <summary>
         /// Logger for data collection messages
         /// </summary>
-        private IDataCollectionLog dataCollectionLog;
+        private IMessageSink messageSink;
 
         #endregion
 
@@ -94,12 +94,13 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         #region public methods
 
         /// <inheritdoc/>
-        public void Initialize(SessionId id, string outputDirectory, IDataCollectionLog dataCollectionLog)
+        public void Initialize(SessionId id, string outputDirectory, IMessageSink messageSink)
         {
             ValidateArg.NotNull(id, nameof(id));
-            ValidateArg.NotNull(dataCollectionLog, nameof(dataCollectionLog));
 
-            this.dataCollectionLog = dataCollectionLog;
+            ValidateArg.NotNull(messageSink, nameof(messageSink));
+
+            this.messageSink = messageSink;
 
             if (string.IsNullOrEmpty(outputDirectory))
             {
@@ -170,6 +171,8 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// <inheritdoc/>
         public void AddAttachment(FileTransferInformationExtension fileTransferInfo)
         {
+            ValidateArg.NotNull(fileTransferInfo, nameof(fileTransferInfo));
+
             if (string.IsNullOrEmpty(this.SessionOutputDirectory))
             {
                 if (EqtTrace.IsErrorEnabled)
@@ -199,7 +202,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// </summary>
         public void Dispose()
         {
-            // Dispose all requests.
+            // Dispose all attachment requests..
             this.AttachmentRequests.ForEach(request => request.Dispose());
             this.AttachmentRequests.Clear();
             this.SessionOutputDirectory = null;
@@ -366,8 +369,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// <param name="path">
         /// The path.
         /// </param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
-            Justification = "Ignorable error which shouldn't crash the data collection framework.")]
         private void TriggerCallback(
             AsyncCompletedEventHandler transferCompletedCallback,
             object userToken,
@@ -398,8 +399,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// Move attachment.
         /// </summary>
         /// <param name="attachmentRequest">Attachment request</param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
-            Justification = "Need to catch all exception type to send  as data collection error to client.")]
         private void MoveAttachment(AttachmentRequest attachmentRequest)
         {
             Exception error = null;
@@ -441,7 +440,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// </param>
         private void LogError(string errorMessage, Uri collectorUri, string collectorFriendlyName, Guid testCaseId)
         {
-            Debug.Assert(this.dataCollectionLog != null, "DataCollectionLog cannot be null");
+            //Debug.Assert(this.messageSink != null, "DataCollectionLog cannot be null");
             var args = new DataCollectionMessageEventArgs(TestMessageLevel.Error, errorMessage)
             {
                 Uri = collectorUri,
@@ -453,7 +452,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                 args.TestCaseId = testCaseId;
             }
 
-            this.dataCollectionLog.SendDataCollectionMessage(args);
+            this.messageSink.SendMessage(args);
         }
 
         #endregion
