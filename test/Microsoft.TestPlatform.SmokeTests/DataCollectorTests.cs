@@ -13,12 +13,11 @@ namespace Microsoft.TestPlatform.SmokeTests
     public class DataCollectorTests : IntegrationTestBase
     {
         [TestMethod]
-        [Ignore]
         public void RunAllWithInProcDataCollectorSettings()
         {
             var runSettings = this.GetInProcDataCollectionRunsettingsFile();
 
-            this.InvokeVsTestForExecution(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), runSettings);
+            this.InvokeVsTestForExecution(this.GetSampleTestAssembly(), this.GetTestAdapterPath(UnitTestFramework.XUnit), runSettings);
             this.ValidateSummaryStatus(1, 1, 1);
             this.ValidatePassedTests("SampleUnitTestProject.UnitTest1.PassingTest");
             this.ValidateFailedTests("SampleUnitTestProject.UnitTest1.FailingTest");
@@ -46,7 +45,7 @@ namespace Microsoft.TestPlatform.SmokeTests
             var fileContents = @"<RunSettings>
                                     <InProcDataCollectionRunSettings>
                                         <InProcDataCollectors>
-                                            <InProcDataCollector friendlyName='Test Impact' uri='InProcDataCollector://Microsoft/TestImpact/1.0' assemblyQualifiedName='SimpleDataCollector.SimpleDataCollector, SimpleDataCollector, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7ccb7239ffde675a'  codebase={0}>
+                                            <InProcDataCollector friendlyName='Test Impact' uri='InProcDataCollector://Microsoft/TestImpact/1.0' assemblyQualifiedName='SimpleDataCollector.SimpleDataCollector, SimpleDataCollector, Version=15.0.0.0, Culture=neutral, PublicKeyToken=7ccb7239ffde675a'  codebase={0}>
                                                 <Configuration>
                                                     <Port>4312</Port>
                                                 </Configuration>

@@ -20,7 +20,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     {
         #region Fields
 
-        private static CustomGuidConverter guidConverter = new CustomGuidConverter();
         private static CustomKeyValueConverter keyValueConverter = new CustomKeyValueConverter();
         private static CustomStringArrayConverter stringArrayConverter = new CustomStringArrayConverter();
 
@@ -57,6 +56,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                         null,
                         property.Key.Attributes,
                         typeof(TestObject));
+
+                    // Do not call SetPropertyValue(TestProperty property, object value) as it does not
+                    // invoke ConvertPropertyFrom and does not store the properties in correct types.
                     this.SetPropertyValue(property.Key, property.Value, CultureInfo.InvariantCulture);
                 }
             }
@@ -340,11 +342,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
 
             var valueType = property.GetValueType();
-
-            if (valueType == typeof(Guid))
-            {
-                return (T)guidConverter.ConvertTo(null, culture, value, valueType);
-            }
 
             TypeConverter converter = TypeDescriptor.GetConverter(valueType);
 
