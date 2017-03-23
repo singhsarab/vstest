@@ -56,6 +56,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
         private bool hostExitedEventRaised;
 
+        private string hostPackageVersion = "15.0.0";
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DotnetTestHostManager"/> class.
         /// </summary>
@@ -93,6 +95,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// project must be launched in a separate test host process.
         /// </remarks>
         public bool Shared => false;
+
+        internal bool IsVersionCheckRequired => !hostPackageVersion.StartsWith("15.0.0");
 
         protected int ErrorLength { get; set; } = 1000;
 
@@ -342,6 +346,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                         }
 
                         testHostPath = Path.Combine(testhostPackage.Path, testHostPath);
+                        hostPackageVersion = testhostPackage.Version;
                         EqtTrace.Verbose("DotnetTestHostmanager: Relative path of testhost.dll with respect to package folder is {0}", testHostPath);
                     }
                 }
@@ -376,7 +381,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             return testHostPath;
         }
-
+        
         private CancellationTokenSource GetCancellationTokenSource()
         {
             this.hostLaunchCts = new CancellationTokenSource(this.TimeOut);

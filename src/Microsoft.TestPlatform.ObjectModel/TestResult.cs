@@ -13,8 +13,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// Represents the result of a test case.
     /// </summary>
     [DataContract]
-    public sealed class TestResult : TestObject
+    public class TestResult : TestObject
     {
+        private TestOutcome outcome;
+        public string errorMessage;
+        public string errorStackTrace;
+        public string displayName;
+        public string computerName;
+        public TimeSpan duration;
+        public DateTimeOffset startTime;
+        public DateTimeOffset endTime;
+
         #region Constructor
 
         /// <summary>
@@ -61,68 +70,86 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Gets or sets the outcome of a test case.
         /// </summary>
-        [IgnoreDataMember]
+        [DataMember]
         public TestOutcome Outcome
         {
             get
             {
-                return this.GetPropertyValue(TestResultProperties.Outcome, TestOutcome.None);
+                //if (this.outcome == TestOutcome.None)
+                //{
+                //    this.outcome = this.GetPropertyValue(TestResultProperties.Outcome, TestOutcome.None);
+                //}
+                return this.outcome;
             }
 
             set
             {
-                this.SetPropertyValue(TestResultProperties.Outcome, value);
+                var convertedValue = ConvertPropertyFrom<TestOutcome>(TestResultProperties.Outcome, CultureInfo.InvariantCulture, value);
+                this.outcome = (TestOutcome)convertedValue;
+                //this.SetPropertyValue(TestResultProperties.Outcome, value);
             }
         }
 
         /// <summary>
         /// Gets or sets the exception message.
         /// </summary>
-        [IgnoreDataMember]
+        [DataMember]
         public string ErrorMessage
         {
             get
             {
-                return this.GetPropertyValue<string>(TestResultProperties.ErrorMessage, null);
+                //if (string.IsNullOrEmpty(this.errorMessage))
+                //{
+                //    this.errorMessage = this.GetPropertyValue<string>(TestResultProperties.ErrorMessage, null);
+                //}
+                return this.errorMessage;
             }
 
             set
             {
-                this.SetPropertyValue(TestResultProperties.ErrorMessage, value);
+                this.errorMessage = value;
             }
         }
 
         /// <summary>
         /// Gets or sets the exception stack trace.
         /// </summary>
-        [IgnoreDataMember]
+        [DataMember]
         public string ErrorStackTrace
         {
             get
             {
-                return this.GetPropertyValue<string>(TestResultProperties.ErrorStackTrace, null);
+                //if (string.IsNullOrEmpty(this.errorStackTrace))
+                //{
+                //    this.errorStackTrace = this.GetPropertyValue<string>(TestResultProperties.ErrorStackTrace, null);
+                //}
+                return this.errorStackTrace;
             }
 
             set
             {
-                this.SetPropertyValue(TestResultProperties.ErrorStackTrace, value);
+                this.errorStackTrace = value;
             }
         }
 
         /// <summary>
         /// Gets or sets the TestResult Display name. Used for Data Driven Test (i.e. Data Driven Test. E.g. InlineData in xUnit)
         /// </summary>
-        [IgnoreDataMember]
+        [DataMember]
         public string DisplayName
         {
             get
             {
-                return this.GetPropertyValue<string>(TestResultProperties.DisplayName, null);
+                //if (string.IsNullOrEmpty(this.displayName))
+                //{
+                //    this.displayName = this.GetPropertyValue<string>(TestResultProperties.DisplayName, null);
+                //}
+                return this.displayName;
             }
 
             set
             {
-                this.SetPropertyValue(TestResultProperties.DisplayName, value);
+                this.displayName = value;
             }
         }
 
@@ -139,75 +166,95 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Gets or sets test result ComputerName.
         /// </summary>
-        [IgnoreDataMember]
+        [DataMember]
         public string ComputerName
         {
             get
             {
-                return this.GetPropertyValue(TestResultProperties.ComputerName, string.Empty);
+                //if (string.IsNullOrEmpty(this.computerName))
+                //{
+                //    this.computerName = this.GetPropertyValue<string>(TestResultProperties.ComputerName, null);
+                //}
+                return this.computerName;
             }
 
             set
             {
-                this.SetPropertyValue(TestResultProperties.ComputerName, value);
+                var convertedValue = ConvertPropertyFrom<string>(TestResultProperties.ComputerName, CultureInfo.InvariantCulture, value);
+                this.computerName = (string)convertedValue;
             }
         }
 
         /// <summary>
         /// Gets or sets the test result Duration.
         /// </summary>
-        [IgnoreDataMember]
+        [DataMember]
         public TimeSpan Duration
         {
             get
             {
-                return this.GetPropertyValue(TestResultProperties.Duration, TimeSpan.Zero);
+                //if (this.duration == default(TimeSpan))
+                //{
+                //    this.duration = this.GetPropertyValue<TimeSpan>(TestResultProperties.Duration, TimeSpan.Zero);
+                //}
+                return this.duration;
             }
 
             set
             {
-                this.SetPropertyValue(TestResultProperties.Duration, value);
+                var convertedValue = ConvertPropertyFrom<TimeSpan>(TestResultProperties.Duration, CultureInfo.InvariantCulture, value);
+                this.duration = (TimeSpan)convertedValue;
             }
         }
 
         /// <summary>
         /// Gets or sets the test result StartTime.
         /// </summary>
-        [IgnoreDataMember]
+        [DataMember]
         public DateTimeOffset StartTime
         {
             get
             {
-                return this.GetPropertyValue(TestResultProperties.StartTime, DateTimeOffset.Now);
+                //if (this.startTime == default(DateTimeOffset))
+                //{
+                //    this.startTime = this.GetPropertyValue<DateTimeOffset>(TestResultProperties.StartTime, DateTimeOffset.Now);
+                //}
+                return this.startTime;
             }
 
             set
             {
-                this.SetPropertyValue(TestResultProperties.StartTime, value);
+                var convertedValue = ConvertPropertyFrom<DateTimeOffset>(TestResultProperties.StartTime, CultureInfo.InvariantCulture, value);
+                this.startTime = (DateTimeOffset)convertedValue;
             }
         }
 
         /// <summary>
         /// Gets or sets test result EndTime.
         /// </summary>
-        [IgnoreDataMember]
+        [DataMember]
         public DateTimeOffset EndTime
         {
             get
             {
-                return this.GetPropertyValue(TestResultProperties.EndTime, DateTimeOffset.Now);
+                //if (this.endTime == default(DateTimeOffset))
+                //{
+                //    this.endTime = this.GetPropertyValue<DateTimeOffset>(TestResultProperties.EndTime, DateTimeOffset.Now);
+                //}
+                return this.endTime;
             }
 
             set
             {
-                this.SetPropertyValue(TestResultProperties.EndTime, value);
+                var convertedValue = ConvertPropertyFrom<DateTimeOffset>(TestResultProperties.EndTime, CultureInfo.InvariantCulture, value);
+                this.endTime = (DateTimeOffset)convertedValue;
             }
         }
 
         #endregion
 
         #region Methods
-        
+
 
         /// <inheritdoc/>
         public override string ToString()
