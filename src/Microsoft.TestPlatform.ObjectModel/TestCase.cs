@@ -31,7 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private string source;
         private Uri executerUri;
         private string codeFilePath;
-        private int lineNumber;
+        private int lineNumber = -1;
 
         #region Constructor
 
@@ -93,8 +93,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 if (this.id == Guid.Empty)
                 {
-                    //id = this.GetPropertyValue<Guid>(TestCaseProperties.Id, Guid.Empty);
-
                     // user has not specified his own Id during ctor! We will cache Id if its empty
                     if (this.defaultId == Guid.Empty)
                     {
@@ -111,7 +109,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 var convertedValue = ConvertPropertyFrom<Guid>(TestCaseProperties.Id, CultureInfo.InvariantCulture, value);
                 this.id = (Guid)convertedValue;
-                //this.SetPropertyValue(TestCaseProperties.Id, value);
             }
         }
 
@@ -123,20 +120,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                //if (string.IsNullOrEmpty(this.fullyQualifiedName))
-                //{
-                //    this.fullyQualifiedName = this.GetPropertyValue<string>(TestCaseProperties.FullyQualifiedName, null);
-                //}
                 return this.fullyQualifiedName;
             }
 
             set
             {
                 this.fullyQualifiedName = value;
-                //this.SetPropertyValue(TestCaseProperties.FullyQualifiedName, value);
-
-                // Id is based on Name/Source, will nulll out guid and it gets calc next time we access it.
-                this.defaultId = Guid.Empty;
             }
         }
 
@@ -148,17 +137,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                //if (string.IsNullOrEmpty(this.displayName))
-                //{
-                //    this.displayName = this.GetPropertyValue<string>(TestCaseProperties.DisplayName, null);
-                //}
+                if (string.IsNullOrEmpty(this.displayName))
+                {
+                    return this.FullyQualifiedName;
+                }
                 return this.displayName;
             }
 
             set
             {
                 this.displayName = value;
-                //this.SetPropertyValue(TestCaseProperties.ExecutorUri, value);
             }
         }
 
@@ -170,10 +158,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                //if (this.executerUri == default(Uri))
-                //{
-                //    this.executerUri = this.GetPropertyValue<Uri>(TestCaseProperties.ExecutorUri, null);
-                //}
                 return this.executerUri;
             }
 
@@ -181,7 +165,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 var convertedValue = ConvertPropertyFrom<Uri>(TestCaseProperties.ExecutorUri, CultureInfo.InvariantCulture, value);
                 this.executerUri = (Uri)convertedValue;
-                //this.SetPropertyValue(TestCaseProperties.ExecutorUri, value);
             }
         }
 
@@ -193,18 +176,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                //if (string.IsNullOrEmpty(this.source))
-                //{
-                //    this.source = this.GetPropertyValue<string>(TestCaseProperties.Source, null);
-                //}
                 return source;
             }
-
-            //private set
+            
             set
             {
                 this.source = value;
-                //this.SetPropertyValue(TestCaseProperties.Source, value);
 
                 // Id is based on Name/Source, will nulll out guid and it gets calc next time we access it.
                 this.defaultId = Guid.Empty;
@@ -217,20 +194,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [DataMember]
         public string CodeFilePath
         {
-            // get;set;
             get
             {
-                //if (string.IsNullOrEmpty(this.codeFilePath))
-                //{
-                //    this.codeFilePath = this.GetPropertyValue<string>(TestCaseProperties.CodeFilePath, null);
-                //}
                 return this.codeFilePath;
             }
 
             set
             {
                 this.codeFilePath = value;
-                //this.SetPropertyValue(TestCaseProperties.CodeFilePath, value);
             }
         }
 
@@ -242,18 +213,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                //if (this.lineNumber == 0)
-                //{
-                //    this.lineNumber = this.GetPropertyValue(TestCaseProperties.LineNumber, -1);
-                //}
                 return this.lineNumber;
             }
 
             set
             {
                 var convertedValue = ConvertPropertyFrom<int>(TestCaseProperties.LineNumber, CultureInfo.InvariantCulture, value);
-                this.lineNumber = (int)convertedValue;  //value;
-                //this.SetPropertyValue(TestCaseProperties.LineNumber, value);
+                this.lineNumber = (int)convertedValue;
             }
         }
 

@@ -13,16 +13,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// Represents the result of a test case.
     /// </summary>
     [DataContract]
-    public class TestResult : TestObject
+    public sealed class TestResult : TestObject
     {
         private TestOutcome outcome;
-        public string errorMessage;
-        public string errorStackTrace;
-        public string displayName;
-        public string computerName;
-        public TimeSpan duration;
-        public DateTimeOffset startTime;
-        public DateTimeOffset endTime;
+        private string errorMessage;
+        private string errorStackTrace;
+        private string displayName;
+        private string computerName;
+        private TimeSpan duration;
+        private DateTimeOffset startTime;
+        private DateTimeOffset endTime;
 
         #region Constructor
 
@@ -75,10 +75,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                //if (this.outcome == TestOutcome.None)
-                //{
-                //    this.outcome = this.GetPropertyValue(TestResultProperties.Outcome, TestOutcome.None);
-                //}
                 return this.outcome;
             }
 
@@ -86,7 +82,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 var convertedValue = ConvertPropertyFrom<TestOutcome>(TestResultProperties.Outcome, CultureInfo.InvariantCulture, value);
                 this.outcome = (TestOutcome)convertedValue;
-                //this.SetPropertyValue(TestResultProperties.Outcome, value);
             }
         }
 
@@ -98,10 +93,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                //if (string.IsNullOrEmpty(this.errorMessage))
-                //{
-                //    this.errorMessage = this.GetPropertyValue<string>(TestResultProperties.ErrorMessage, null);
-                //}
                 return this.errorMessage;
             }
 
@@ -119,10 +110,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                //if (string.IsNullOrEmpty(this.errorStackTrace))
-                //{
-                //    this.errorStackTrace = this.GetPropertyValue<string>(TestResultProperties.ErrorStackTrace, null);
-                //}
                 return this.errorStackTrace;
             }
 
@@ -140,10 +127,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                //if (string.IsNullOrEmpty(this.displayName))
-                //{
-                //    this.displayName = this.GetPropertyValue<string>(TestResultProperties.DisplayName, null);
-                //}
                 return this.displayName;
             }
 
@@ -171,10 +154,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                //if (string.IsNullOrEmpty(this.computerName))
-                //{
-                //    this.computerName = this.GetPropertyValue<string>(TestResultProperties.ComputerName, null);
-                //}
                 return this.computerName;
             }
 
@@ -193,10 +172,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                //if (this.duration == default(TimeSpan))
-                //{
-                //    this.duration = this.GetPropertyValue<TimeSpan>(TestResultProperties.Duration, TimeSpan.Zero);
-                //}
                 return this.duration;
             }
 
@@ -215,10 +190,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                //if (this.startTime == default(DateTimeOffset))
-                //{
-                //    this.startTime = this.GetPropertyValue<DateTimeOffset>(TestResultProperties.StartTime, DateTimeOffset.Now);
-                //}
+                if (this.startTime == default(DateTimeOffset))
+                {
+                    this.startTime = DateTimeOffset.Now;
+                }
                 return this.startTime;
             }
 
@@ -237,10 +212,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                //if (this.endTime == default(DateTimeOffset))
-                //{
-                //    this.endTime = this.GetPropertyValue<DateTimeOffset>(TestResultProperties.EndTime, DateTimeOffset.Now);
-                //}
+                if (this.endTime == default(DateTimeOffset))
+                {
+                    this.endTime = DateTimeOffset.Now;
+                }
                 return this.endTime;
             }
 
