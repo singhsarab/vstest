@@ -33,13 +33,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
         {
             // P2 to P1
             var testCase = (value as TestCase);
-            testCase.SetPropertyValue<Guid>(TestCaseProperties.Id, testCase.Id);
+
             testCase.SetPropertyValue<string>(TestCaseProperties.FullyQualifiedName, testCase.FullyQualifiedName);
-            testCase.SetPropertyValue<string>(TestCaseProperties.DisplayName, testCase.DisplayName);
-            testCase.SetPropertyValue<string>(TestCaseProperties.Source, testCase.Source);
             testCase.SetPropertyValue<Uri>(TestCaseProperties.ExecutorUri, testCase.ExecutorUri);
-            testCase.SetPropertyValue<string>(TestCaseProperties.CodeFilePath, testCase.CodeFilePath);
-            testCase.SetPropertyValue<int>(TestCaseProperties.LineNumber, testCase.LineNumber);
+            testCase.SetPropertyValue<string>(TestCaseProperties.Source, testCase.Source);
+            testCase.SetPropertyValue<Guid>(TestCaseProperties.Id, testCase.Id);
+            if (!testCase.DisplayName.Equals(testCase.FullyQualifiedName)) testCase.SetPropertyValue<string>(TestCaseProperties.DisplayName, testCase.DisplayName);
+
+            if (!string.IsNullOrEmpty(testCase.CodeFilePath)) testCase.SetPropertyValue<string>(TestCaseProperties.CodeFilePath, testCase.CodeFilePath);
+            if (testCase.LineNumber >= 0) testCase.SetPropertyValue<int>(TestCaseProperties.LineNumber, testCase.LineNumber);
 
             var properties = testCase.GetProperties();
 

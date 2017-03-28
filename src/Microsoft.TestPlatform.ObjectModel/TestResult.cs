@@ -190,10 +190,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                if (this.startTime == default(DateTimeOffset))
-                {
-                    this.startTime = DateTimeOffset.Now;
-                }
+                //if (this.startTime == default(DateTimeOffset))
+                //{
+                //    this.startTime = DateTimeOffset.Now;
+                //}
                 return this.startTime;
             }
 
@@ -212,10 +212,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                if (this.endTime == default(DateTimeOffset))
-                {
-                    this.endTime = DateTimeOffset.Now;
-                }
+                //if (this.endTime == default(DateTimeOffset))
+                //{
+                //    this.endTime = DateTimeOffset.Now;
+                //}
                 return this.endTime;
             }
 

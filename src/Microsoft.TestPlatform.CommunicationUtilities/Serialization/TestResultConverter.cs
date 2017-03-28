@@ -35,17 +35,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
         {
             // P2 to P1
             var testResult = (value as TestResult);
-            testResult.SetPropertyValue<TestOutcome>(TestResultProperties.Outcome, testResult.Outcome);
-            testResult.SetPropertyValue<string>(TestResultProperties.ErrorMessage, testResult.ErrorMessage);
-            testResult.SetPropertyValue<string>(TestResultProperties.ErrorStackTrace, testResult.ErrorStackTrace);
-            testResult.SetPropertyValue<string>(TestResultProperties.DisplayName, testResult.DisplayName);
-            if (!string.IsNullOrEmpty(testResult.ComputerName))
-            {
-                testResult.SetPropertyValue<string>(TestResultProperties.ComputerName, testResult.ComputerName);
-            }
-            testResult.SetPropertyValue<TimeSpan>(TestResultProperties.Duration, testResult.Duration);
-            testResult.SetPropertyValue<DateTimeOffset>(TestResultProperties.StartTime, testResult.StartTime);
-            testResult.SetPropertyValue<DateTimeOffset>(TestResultProperties.EndTime, testResult.EndTime);
+            if (testResult.Outcome != TestOutcome.None) testResult.SetPropertyValue<TestOutcome>(TestResultProperties.Outcome, testResult.Outcome);
+            if (!string.IsNullOrEmpty(testResult.ErrorMessage)) testResult.SetPropertyValue<string>(TestResultProperties.ErrorMessage, testResult.ErrorMessage);
+            if (!string.IsNullOrEmpty(testResult.ErrorStackTrace)) testResult.SetPropertyValue<string>(TestResultProperties.ErrorStackTrace, testResult.ErrorStackTrace);
+            if (!string.IsNullOrEmpty(testResult.DisplayName)) testResult.SetPropertyValue<string>(TestResultProperties.DisplayName, testResult.DisplayName);
+            if (!string.IsNullOrEmpty(testResult.ComputerName)) testResult.SetPropertyValue<string>(TestResultProperties.ComputerName, testResult.ComputerName);
+            if (testResult.Duration != default(TimeSpan)) testResult.SetPropertyValue<TimeSpan>(TestResultProperties.Duration, testResult.Duration);
+
+            if (testResult.StartTime != default(DateTimeOffset)) testResult.SetPropertyValue<DateTimeOffset>(TestResultProperties.StartTime, testResult.StartTime);
+            if (testResult.EndTime != default(DateTimeOffset)) testResult.SetPropertyValue<DateTimeOffset>(TestResultProperties.EndTime, testResult.EndTime);
 
             var properties = testResult.GetProperties();
 
