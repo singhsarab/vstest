@@ -64,6 +64,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
         }
 
+        public List<KeyValuePair<TestProperty, object>> GetProperties()
+        {
+            return this.store.ToList();
+        }
+
         #endregion Fields
 
         #region Constructors
@@ -269,7 +274,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// Convert passed in value from TestProperty's specified value type.
         /// </summary>
         /// <returns>Converted object</returns>
-        private static object ConvertPropertyFrom<T>(TestProperty property, CultureInfo culture, object value)
+        internal static object ConvertPropertyFrom<T>(TestProperty property, CultureInfo culture, object value)
         {
             ValidateArg.NotNull(property, "property");
             ValidateArg.NotNull(culture, "culture");
