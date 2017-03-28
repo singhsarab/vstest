@@ -96,7 +96,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// </remarks>
         public bool Shared => false;
 
-        internal bool IsVersionCheckRequired => !hostPackageVersion.StartsWith("15.0.0");
+        internal virtual bool IsVersionCheckRequired => !hostPackageVersion.StartsWith("15.0.0");
 
         protected int ErrorLength { get; set; } = 1000;
 
