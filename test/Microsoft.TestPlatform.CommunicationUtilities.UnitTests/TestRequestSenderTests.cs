@@ -73,6 +73,35 @@ namespace TestPlatform.CommunicationUtilities.UnitTests
             this.mockCommunicationManager.Verify(mc => mc.StopServer(), Times.Once);
         }
 
+        [TestMethod]
+        public void VersionCheckWithTestHostShouldCheckVersionIfVersionCheckPassesReturnTrue()
+        {
+            var message = new Message() { MessageType = MessageType.VersionCheck, Payload = version };
+            this.mockCommunicationManager.Setup(mc => mc.ReceiveMessage()).Returns(message);
+            var success = this.testRequestSender.CheckVersionWithTestHost();
+            this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.VersionCheck, this.version), Times.Once);
+            Assert.IsTrue(success);
+        }
+
+        [TestMethod]
+        public void VersionCheckWithTestHostShouldBeAbleToReceiveProtocolErrorAndReturnFalse()
+        {
+            var message = new Message() { MessageType = MessageType.ProtocolError, Payload = version };
+            this.mockCommunicationManager.Setup(mc => mc.ReceiveMessage()).Returns(message);
+            var success = this.testRequestSender.CheckVersionWithTestHost();
+            this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.VersionCheck, this.version), Times.Once);
+            Assert.IsFalse(success);
+        }
+
+        [TestMethod]
+        public void VersionCheckWithTestHostForInvalidMessageShouldReturnFalse()
+        {
+            var message = new Message() { MessageType = MessageType.TestCasesFound, Payload = null };
+            this.mockCommunicationManager.Setup(mc => mc.ReceiveMessage()).Returns(message);
+            var success = this.testRequestSender.CheckVersionWithTestHost();
+            this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.VersionCheck, this.version), Times.Once);
+            Assert.IsFalse(success);
+        }
 
         [TestMethod]
         public void InitializeDiscoveryShouldSendCommunicationMessageWithCorrectParameters()

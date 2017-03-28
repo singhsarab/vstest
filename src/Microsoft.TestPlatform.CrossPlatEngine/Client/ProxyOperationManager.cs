@@ -133,7 +133,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 var dotnetHostManager = this.testHostManager as DotnetTestHostManager;
                 if (dotnetHostManager == null || dotnetHostManager.IsVersionCheckRequired)
                 {
-                    if (!this.RequestSender.HandShakeWithTestHost())
+                    if (!this.RequestSender.CheckVersionWithTestHost())
                     {
                         throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, "Protocol version check failed"));
                     }

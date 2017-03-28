@@ -25,7 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         /// Used for protocol version check with TestHost
         /// </summary>
         /// <returns></returns>
-        bool HandShakeWithTestHost();
+        bool CheckVersionWithTestHost();
 
         /// <summary>
         /// Waits for Request Handler to be connected 

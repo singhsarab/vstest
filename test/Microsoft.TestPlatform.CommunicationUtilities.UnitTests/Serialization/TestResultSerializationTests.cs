@@ -35,6 +35,8 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
                                                        EndTime = DateTimeOffset.MaxValue
                                                    };
 
+        #region v1 tests
+
         [TestMethod]
         public void TestResultJsonShouldContainAllPropertiesOnSerialization()
         {
@@ -107,14 +109,84 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
             Assert.AreEqual("sampleAttachment", result.Attachments[0].DisplayName);
         }
 
-        private static string Serialize<T>(T data)
+        #endregion
+
+        #region v2 Tests
+
+        [TestMethod]
+        public void TestResultJsonShouldContainAllPropertiesOnSerializationV2()
         {
-            return JsonDataSerializer.Instance.Serialize(data);
+            var json = Serialize(testResult, 2);
+
+            // Use raw deserialization to validate basic properties
+            dynamic data = JObject.Parse(json);
+
+            Assert.AreEqual(1, data["Outcome"].Value);
+            Assert.AreEqual("sampleError", data["ErrorMessage"].Value);
+            Assert.AreEqual("sampleStackTrace", data["ErrorStackTrace"].Value);
+            Assert.AreEqual("sampleTestResult", data["DisplayName"].Value);
+            Assert.AreEqual("sampleComputerName", data["ComputerName"].Value);
+            Assert.AreEqual("10675199.02:48:05.4775807", data["Duration"].Value);
+
+            // By default json.net converts DateTimes to current time zone
+            Assert.AreEqual(startTime.Year, ((DateTimeOffset)data["StartTime"].Value).Year);
+            Assert.AreEqual(DateTimeOffset.MaxValue.Year, ((DateTimeOffset)data["EndTime"].Value).Year);
         }
 
-        private static T Deserialize<T>(string json)
+        [TestMethod]
+        public void TestResultObjectShouldContainAllPropertiesOnDeserializationV2()
         {
-            return JsonDataSerializer.Instance.Deserialize<T>(json);
+            var json = "{\"TestCase\":{\"Id\":\"28e7a7ed-8fb9-05b7-5e90-4a8c52f32b5b\",\"FullyQualifiedName\":\"sampleTestClass.sampleTestCase\",\"DisplayName\":\"sampleTestClass.sampleTestCase\",\"ExecutorUri\":\"executor://sampleTestExecutor\",\"Source\":\"sampleTest.dll\",\"CodeFilePath\":null,\"LineNumber\":-1,\"Properties\":[]},\"Attachments\":[],\"Outcome\":1,\"ErrorMessage\":\"sampleError\",\"ErrorStackTrace\":\"sampleStackTrace\",\"DisplayName\":\"sampleTestResult\",\"Messages\":[],\"ComputerName\":\"sampleComputerName\",\"Duration\":\"10675199.02:48:05.4775807\",\"StartTime\":\"2007-03-10T00:00:00+05:30\",\"EndTime\":\"9999-12-31T23:59:59.9999999+00:00\",\"Properties\":[]}";
+
+            var test = Deserialize<TestResult>(json, 2);
+
+            Assert.AreEqual(testResult.TestCase.Id, test.TestCase.Id);
+            Assert.AreEqual(testResult.Attachments.Count, test.Attachments.Count);
+            Assert.AreEqual(testResult.Messages.Count, test.Messages.Count);
+
+            Assert.AreEqual(testResult.ComputerName, test.ComputerName);
+            Assert.AreEqual(testResult.DisplayName, test.DisplayName);
+            Assert.AreEqual(testResult.Duration, test.Duration);
+            Assert.AreEqual(testResult.EndTime, test.EndTime);
+            Assert.AreEqual(testResult.ErrorMessage, test.ErrorMessage);
+            Assert.AreEqual(testResult.ErrorStackTrace, test.ErrorStackTrace);
+            Assert.AreEqual(testResult.Outcome, test.Outcome);
+            Assert.AreEqual(testResult.StartTime, test.StartTime);
+        }
+
+        [TestMethod]
+        public void TestResultObjectShouldSerializeAttachmentsV2()
+        {
+            var result = new TestResult(testCase);
+            result.Attachments.Add(new AttachmentSet(new Uri("http://dummyUri"), "sampleAttachment"));
+            var expectedJson = "{\"TestCase\":{\"Properties\":[{\"Key\":{\"Id\":\"TestCase.FullyQualifiedName\",\"Label\":\"FullyQualifiedName\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.String\"},\"Value\":\"sampleTestClass.sampleTestCase\"},{\"Key\":{\"Id\":\"TestCase.ExecutorUri\",\"Label\":\"Executor Uri\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.Uri\"},\"Value\":\"executor://sampleTestExecutor\"},{\"Key\":{\"Id\":\"TestCase.Source\",\"Label\":\"Source\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"sampleTest.dll\"},{\"Key\":{\"Id\":\"TestCase.Id\",\"Label\":\"Id\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.Guid\"},\"Value\":\"28e7a7ed-8fb9-05b7-5e90-4a8c52f32b5b\"}]},\"Attachments\":[{\"Uri\":\"http://dummyUri\",\"DisplayName\":\"sampleAttachment\",\"Attachments\":[]}],\"Messages\":[],\"Properties\":[]}";
+            var json = Serialize(result);
+
+            Assert.AreEqual(expectedJson, json);
+        }
+
+        [TestMethod]
+        public void TestResultObjectShouldDeserializeAttachmentsV2()
+        {
+            var json = "{\"TestCase\":{\"Properties\":[{\"Key\":{\"Id\":\"TestCase.FullyQualifiedName\",\"Label\":\"FullyQualifiedName\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.String\"},\"Value\":\"sampleTestClass.sampleTestCase\"},{\"Key\":{\"Id\":\"TestCase.ExecutorUri\",\"Label\":\"Executor Uri\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.Uri\"},\"Value\":\"executor://sampleTestExecutor\"},{\"Key\":{\"Id\":\"TestCase.Source\",\"Label\":\"Source\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"sampleTest.dll\"},{\"Key\":{\"Id\":\"TestCase.Id\",\"Label\":\"Id\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.Guid\"},\"Value\":\"28e7a7ed-8fb9-05b7-5e90-4a8c52f32b5b\"}]},\"Attachments\":[{\"Uri\":\"http://dummyUri\",\"DisplayName\":\"sampleAttachment\",\"Attachments\":[]}],\"Messages\":[],\"Properties\":[]}";
+
+            var result = Deserialize<TestResult>(json);
+
+            Assert.AreEqual(1, result.Attachments.Count);
+            Assert.AreEqual(new Uri("http://dummyUri"), result.Attachments[0].Uri);
+            Assert.AreEqual("sampleAttachment", result.Attachments[0].DisplayName);
+        }
+
+        #endregion
+
+        private static string Serialize<T>(T data, int version = 1)
+        {
+            return JsonDataSerializer.Instance.Serialize(data, version);
+        }
+
+        private static T Deserialize<T>(string json, int version = 1)
+        {
+            return JsonDataSerializer.Instance.Deserialize<T>(json, version);
         }
     }
 }

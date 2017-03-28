@@ -80,7 +80,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             EqtTrace.Info("Closing the connection");
         }
 
-        public bool HandShakeWithTestHost()
+        /// <inheritdoc/>
+        public bool CheckVersionWithTestHost()
         {
             var success = false;
             this.communicationManager.SendMessage(MessageType.VersionCheck, payload: highestNegotiatedVersion);
