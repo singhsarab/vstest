@@ -197,6 +197,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 customHostLauncher);
         }
 
+        /// <inheritdoc/>
+        public void CancelDiscovery()
+        {
+            this.communicationManager.SendMessage(MessageType.CancelDiscovery);
+        }
 
         /// <summary>
         /// Send Cancel TestRun message

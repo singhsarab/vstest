@@ -49,7 +49,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         /// </summary>
         private ITestRunRequest currentTestRunRequest;
 
+        private IDiscoveryRequest currentDiscoveryRequest;
+
         private readonly EventWaitHandle runRequestCreatedEventHandle = new AutoResetEvent(false);
+
+        private readonly EventWaitHandle discoveryRequestCreatedEventHandle = new AutoResetEvent(false);
 
         private object syncobject = new object();
 
@@ -144,6 +148,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             using (IDiscoveryRequest discoveryRequest = this.testPlatform.CreateDiscoveryRequest(criteria))
             {
+
+                this.currentDiscoveryRequest = discoveryRequest;
+                this.discoveryRequestCreatedEventHandle.Set();
                 try
                 {
                     this.testLoggerManager?.RegisterDiscoveryEvents(discoveryRequest);
@@ -231,6 +238,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             var success = this.RunTests(runCriteria, testRunEventsRegistrar);
             EqtTrace.Info("TestRequestManager.RunTests: run tests completed, sucessful: {0}.", success);
             return success;
+        }
+
+        /// <inheritdoc/>
+        public void CancelDiscovery()
+        {
+            EqtTrace.Info("TestRequestManager.CancelDiscovery: Sending cancel request.");
+
+            this.discoveryRequestCreatedEventHandle.WaitOne(runRequestTimeout);
+            this.currentDiscoveryRequest?.Abort();
         }
 
         /// <summary>

@@ -169,6 +169,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                                 break;
                             }
 
+                        case MessageType.CancelDiscovery:
+                            {
+                                testRequestManager.CancelDiscovery();
+                                break;
+                            }
+
                         case MessageType.CancelTestRun:
                             {
                                 testRequestManager.CancelTestRun();

@@ -42,6 +42,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper
         bool RunTests(TestRunRequestPayload testRunRequestPayLoad, ITestHostLauncher customTestHostLauncher, ITestRunEventsRegistrar testRunEventsRegistrar);
 
         /// <summary>
+        /// Cancel the current TestDiscovery request
+        /// </summary>
+        void CancelDiscovery();
+
+        /// <summary>
         /// Cancel the current TestRun request
         /// </summary>
         void CancelTestRun();

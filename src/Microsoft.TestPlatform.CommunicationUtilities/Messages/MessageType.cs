@@ -49,6 +49,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         public const string StartDiscovery = "TestDiscovery.Start";
 
         /// <summary>
+        /// Cancel the current test discovery
+        /// </summary>
+        public const string CancelDiscovery = "TestDiscovery.Cancel";
+
+        /// <summary>
         /// The test cases found.
         /// </summary>
         public const string TestCasesFound = "TestDiscovery.TestFound";

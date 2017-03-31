@@ -87,6 +87,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         void EndSession();
 
         /// <summary>
+        /// Cancel the test discovery
+        /// </summary>
+        void CancelDiscovery();
+
+        /// <summary>
         /// Cancel the test run
         /// </summary>
         void CancelTestRun();
