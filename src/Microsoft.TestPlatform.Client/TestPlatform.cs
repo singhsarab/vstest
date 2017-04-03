@@ -68,7 +68,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// <param name="discoveryCriteria"> The discovery criteria. </param>
         /// <returns> The <see cref="IDiscoveryRequest"/>. </returns>
         /// <exception cref="ArgumentNullException"> Throws if parameter is null. </exception>
-        public IDiscoveryRequest CreateDiscoveryRequest(DiscoveryCriteria discoveryCriteria)
+        public IDiscoveryRequest CreateDiscoveryRequest(DiscoveryCriteria discoveryCriteria, ProtocolConfig config)
         {
             if (discoveryCriteria == null)
             {
@@ -79,7 +79,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
 
             var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
             
-            var discoveryManager = this.TestEngine.GetDiscoveryManager(testHostManager, discoveryCriteria);
+            var discoveryManager = this.TestEngine.GetDiscoveryManager(testHostManager, discoveryCriteria, config);
             discoveryManager.Initialize();
 
             return new DiscoveryRequest(discoveryCriteria, discoveryManager);
@@ -91,7 +91,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// <param name="testRunCriteria"> The test run criteria.  </param>
         /// <returns> The <see cref="ITestRunRequest"/>. </returns>
         /// <exception cref="ArgumentNullException"> Throws if parameter is null. </exception>
-        public ITestRunRequest CreateTestRunRequest(TestRunCriteria testRunCriteria)
+        public ITestRunRequest CreateTestRunRequest(TestRunCriteria testRunCriteria, ProtocolConfig config)
         {
             if (testRunCriteria == null)
             {
@@ -119,7 +119,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 testHostManager.SetCustomLauncher(testRunCriteria.TestHostLauncher);
             }
 
-            var executionManager = this.TestEngine.GetExecutionManager(testHostManager, testRunCriteria);
+            var executionManager = this.TestEngine.GetExecutionManager(testHostManager, testRunCriteria, config);
             executionManager.Initialize();
 
             return new TestRunRequest(testRunCriteria, executionManager);

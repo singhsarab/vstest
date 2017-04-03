@@ -76,6 +76,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public const long DefaultBatchSize = 10;
 
         /// <summary>
+        /// The default protocol version
+        /// </summary>
+        public static readonly ProtocolConfig DefaultProtocolConfig = new ProtocolConfig { Version = 1 };
+
+        /// <summary>
         /// Name of the results directory
         /// </summary>
         public const string ResultsDirectoryName = "TestResults";

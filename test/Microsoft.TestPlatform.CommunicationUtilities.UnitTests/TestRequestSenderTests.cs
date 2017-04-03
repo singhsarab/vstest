@@ -26,14 +26,14 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         private ITestRequestSender testRequestSender;
         private Mock<ICommunicationManager> mockCommunicationManager;
         private Mock<IDataSerializer> mockDataSerializer;
-        private int version = 1;
+        private ProtocolConfig config = new ProtocolConfig { Version = 1 };
 
         [TestInitialize]
         public void TestInit()
         {
             this.mockCommunicationManager = new Mock<ICommunicationManager>();
             this.mockDataSerializer = new Mock<IDataSerializer>();
-            this.testRequestSender = new TestRequestSender(this.mockCommunicationManager.Object, this.mockDataSerializer.Object);
+            this.testRequestSender = new TestRequestSender(this.mockCommunicationManager.Object, this.mockDataSerializer.Object, this.config);
         }
 
         [TestMethod]
@@ -75,20 +75,20 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void VersionCheckWithTestHostShouldCheckVersionIfVersionCheckPassesReturnTrue()
         {
-            var message = new Message() { MessageType = MessageType.VersionCheck, Payload = this.version };
+            var message = new Message() { MessageType = MessageType.VersionCheck, Payload = this.config.Version };
             this.mockCommunicationManager.Setup(mc => mc.ReceiveMessage()).Returns(message);
             var success = this.testRequestSender.CheckVersionWithTestHost();
-            this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.VersionCheck, this.version), Times.Once);
+            this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.VersionCheck, this.config.Version), Times.Once);
             Assert.IsTrue(success);
         }
 
         [TestMethod]
         public void VersionCheckWithTestHostShouldBeAbleToReceiveProtocolErrorAndReturnFalse()
         {
-            var message = new Message() { MessageType = MessageType.ProtocolError, Payload = this.version };
+            var message = new Message() { MessageType = MessageType.ProtocolError, Payload = this.config.Version };
             this.mockCommunicationManager.Setup(mc => mc.ReceiveMessage()).Returns(message);
             var success = this.testRequestSender.CheckVersionWithTestHost();
-            this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.VersionCheck, this.version), Times.Once);
+            this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.VersionCheck, this.config.Version), Times.Once);
             Assert.IsFalse(success);
         }
 
@@ -98,7 +98,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             var message = new Message() { MessageType = MessageType.TestCasesFound, Payload = null };
             this.mockCommunicationManager.Setup(mc => mc.ReceiveMessage()).Returns(message);
             var success = this.testRequestSender.CheckVersionWithTestHost();
-            this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.VersionCheck, this.version), Times.Once);
+            this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.VersionCheck, this.config.Version), Times.Once);
             Assert.IsFalse(success);
         }
 
@@ -108,7 +108,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             var paths = new List<string>() { "Hello", "World" };
             this.testRequestSender.InitializeDiscovery(paths, false);
 
-            this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.DiscoveryInitialize, paths, this.version), Times.Once);
+            this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.DiscoveryInitialize, paths, this.config.Version), Times.Once);
         }
 
         [TestMethod]
@@ -117,7 +117,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             var paths = new List<string>() { "Hello", "World" };
             this.testRequestSender.InitializeExecution(paths, true);
 
-            this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.ExecutionInitialize, paths, this.version), Times.Once);
+            this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.ExecutionInitialize, paths, this.config.Version), Times.Once);
         }
 
         [TestMethod]
@@ -151,7 +151,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
             this.testRequestSender.DiscoverTests(discoveryCriteria, mockHandler.Object);
 
-            this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.StartDiscovery, discoveryCriteria, this.version), Times.Once);
+            this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.StartDiscovery, discoveryCriteria, this.config.Version), Times.Once);
             this.mockDataSerializer.Verify(ds => ds.DeserializeMessage(rawMessage), Times.Exactly(2));
             mockHandler.Verify(mh => mh.HandleDiscoveredTests(testCases), Times.Once);
             mockHandler.Verify(mh => mh.HandleRawMessage(rawMessage), Times.Exactly(2));
@@ -188,7 +188,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
             this.testRequestSender.DiscoverTests(discoveryCriteria, mockHandler.Object);
 
-            this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.StartDiscovery, discoveryCriteria, this.version), Times.Once);
+            this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.StartDiscovery, discoveryCriteria, this.config.Version), Times.Once);
             this.mockDataSerializer.Verify(ds => ds.DeserializeMessage(rawMessage), Times.Exactly(2));
             mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, rawMessage), Times.Once);
             mockHandler.Verify(mh => mh.HandleRawMessage(rawMessage), Times.Exactly(2));
@@ -216,7 +216,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
             this.testRequestSender.DiscoverTests(discoveryCriteria, mockHandler.Object);
 
-            this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.StartDiscovery, discoveryCriteria, this.version), Times.Once);
+            this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.StartDiscovery, discoveryCriteria, this.config.Version), Times.Once);
             this.mockDataSerializer.Verify(ds => ds.DeserializeMessage(rawMessage), Times.Once);
             mockHandler.Verify(mh => mh.HandleDiscoveryComplete(1, null, false), Times.Once);
             mockHandler.Verify(mh => mh.HandleRawMessage(rawMessage), Times.Once);
@@ -230,7 +230,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             var mockHandler = new Mock<ITestDiscoveryEventsHandler>();
             var discoveryCriteria = new DiscoveryCriteria(sources, 100, settingsXml);
             var exception = new Exception();
-            this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.StartDiscovery, discoveryCriteria, this.version))
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.StartDiscovery, discoveryCriteria, this.config.Version))
                 .Throws(exception);
 
             this.testRequestSender.DiscoverTests(discoveryCriteria, mockHandler.Object);
@@ -308,7 +308,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
             waitHandle.WaitOne();
 
-            this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.StartTestExecutionWithSources, runCriteria, this.version), Times.Once);
+            this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.StartTestExecutionWithSources, runCriteria, this.config.Version), Times.Once);
 
             // One for run stats and another for runcomplete
             this.mockDataSerializer.Verify(ds => ds.DeserializeMessage(rawMessage), Times.Exactly(2));
@@ -349,7 +349,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.testRequestSender.StartTestRun(runCriteria, mockHandler.Object);
 
             waitHandle.WaitOne();
-            this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.StartTestExecutionWithTests, runCriteria, this.version), Times.Once);
+            this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.StartTestExecutionWithTests, runCriteria, this.config.Version), Times.Once);
             mockHandler.Verify(mh => mh.HandleTestRunStatsChange(testRunChangedArgs), Times.Once);
             mockHandler.Verify(mh => mh.HandleRawMessage(rawMessage), Times.AtLeastOnce);
         }
@@ -384,7 +384,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.testRequestSender.StartTestRun(runCriteria, mockHandler.Object);
             waitHandle.WaitOne();
 
-            this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.StartTestExecutionWithSources, runCriteria, this.version), Times.Once);
+            this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.StartTestExecutionWithSources, runCriteria, this.config.Version), Times.Once);
             this.mockDataSerializer.Verify(ds => ds.DeserializeMessage(It.IsAny<string>()), Times.Exactly(2));
             mockHandler.Verify(mh => mh.HandleLogMessage(payload.MessageLevel, payload.Message), Times.Once);
             mockHandler.Verify(mh => mh.HandleRawMessage(rawMessage), Times.AtLeastOnce);
@@ -429,12 +429,12 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
             waitHandle.WaitOne();
 
-            this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.StartTestExecutionWithSources, runCriteria, this.version), Times.Once);
+            this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.StartTestExecutionWithSources, runCriteria, this.config.Version), Times.Once);
 
             this.mockDataSerializer.Verify(ds => ds.DeserializeMessage(It.IsAny<string>()), Times.Exactly(2));
             mockHandler.Verify(mh => mh.LaunchProcessWithDebuggerAttached(payload), Times.Once);
             mockHandler.Verify(mh => mh.HandleRawMessage(rawMessage), Times.Exactly(2));
-            this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback, It.IsAny<object>(), this.version), Times.Once);
+            this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback, It.IsAny<object>(), this.config.Version), Times.Once);
         }
 
         [TestMethod]
@@ -461,7 +461,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
             waitHandle.WaitOne();
 
-            this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.StartTestExecutionWithTests, runCriteria, this.version), Times.Once);
+            this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.StartTestExecutionWithTests, runCriteria, this.config.Version), Times.Once);
             this.mockDataSerializer.Verify(ds => ds.DeserializeMessage(rawMessage), Times.Once);
             mockHandler.Verify(mh => mh.HandleTestRunComplete(null, null, null, null), Times.Once);
             mockHandler.Verify(mh => mh.HandleRawMessage(rawMessage), Times.Once);

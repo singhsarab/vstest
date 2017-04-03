@@ -41,8 +41,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRequestSender"/> class.
         /// </summary>
-        public TestRequestSender()
-            : this(new SocketCommunicationManager(), JsonDataSerializer.Instance)
+        /// <param name="config">Protocol configuration</param>
+        public TestRequestSender(ProtocolConfig config)
+            : this(new SocketCommunicationManager(), JsonDataSerializer.Instance, config)
         {
         }
 
@@ -51,8 +52,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// </summary>
         /// <param name="communicationManager">Communication Manager for sending and receiving messages.</param>
         /// <param name="dataSerializer">Serializer for serialization and deserialization of the messages.</param>
-        internal TestRequestSender(ICommunicationManager communicationManager, IDataSerializer dataSerializer)
+        internal TestRequestSender(ICommunicationManager communicationManager, IDataSerializer dataSerializer, ProtocolConfig config)
         {
+            this.highestNegotiatedVersion = config.Version;
             this.communicationManager = communicationManager;
             this.dataSerializer = dataSerializer;
         }
