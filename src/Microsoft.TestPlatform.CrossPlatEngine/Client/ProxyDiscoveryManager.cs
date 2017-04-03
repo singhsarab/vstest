@@ -29,8 +29,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
         /// </summary>
         /// <param name="testHostManager">Test host manager instance.</param>
-        public ProxyDiscoveryManager(ITestRuntimeProvider testHostManager)
-            : this(new TestRequestSender(), testHostManager, CrossPlatEngine.Constants.ClientConnectionTimeout)
+        public ProxyDiscoveryManager(TestRequestSender testRequestSender, ITestRuntimeProvider testHostManager)
+            : this(testRequestSender, testHostManager, CrossPlatEngine.Constants.ClientConnectionTimeout)
         {
             this.testHostManager = testHostManager;
         }

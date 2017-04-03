@@ -18,6 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>
     /// Argument Executor for the "-lt|--ListTests|/lt|/ListTests" command line argument.
@@ -212,7 +213,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             var success = this.testRequestManager.DiscoverTests(
                 new DiscoveryRequestPayload() { Sources = this.commandLineOptions.Sources, RunSettings = runSettings },
-                this.discoveryEventsRegistrar);
+                this.discoveryEventsRegistrar, Constants.DefaultProtocolConfig);
 
             return success ? ArgumentProcessorResult.Success : ArgumentProcessorResult.Fail;
         }

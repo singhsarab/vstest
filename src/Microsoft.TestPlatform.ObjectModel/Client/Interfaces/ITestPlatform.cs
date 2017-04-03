@@ -32,13 +32,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// </summary>
         /// <param name="discoveryCriteria">Specifies the discovery parameters</param>
         /// <returns>DiscoveryRequest object</returns>
-        IDiscoveryRequest CreateDiscoveryRequest(DiscoveryCriteria discoveryCriteria);
+        IDiscoveryRequest CreateDiscoveryRequest(DiscoveryCriteria discoveryCriteria, ProtocolConfig config);
 
         /// <summary>
         /// Creates a test run request.
         /// </summary>
         /// <param name="testRunCriteria">Specifies the test run criteria</param>
         /// <returns>RunRequest object</returns>
-        ITestRunRequest CreateTestRunRequest(TestRunCriteria testRunCriteria);
+        ITestRunRequest CreateTestRunRequest(TestRunCriteria testRunCriteria, ProtocolConfig config);
     }
 }

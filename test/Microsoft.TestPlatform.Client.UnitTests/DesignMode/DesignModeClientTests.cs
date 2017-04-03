@@ -56,7 +56,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
         [TestMethod]
         public void DesignModeClientConnectShouldSetupChannel()
         {
-            var verCheck = new Message { MessageType = MessageType.VersionCheck };
+            var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = 1 };
             var sessionEnd = new Message { MessageType = MessageType.SessionEnd };
             this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
             this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(verCheck).Returns(sessionEnd);
@@ -115,15 +115,18 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
                         trm.RunTests(
                             It.IsAny<TestRunRequestPayload>(),
                             It.IsAny<ITestHostLauncher>(),
-                            It.IsAny<ITestRunEventsRegistrar>()))
+                            It.IsAny<ITestRunEventsRegistrar>(),
+                            It.IsAny<ProtocolConfig>()))
                 .Callback(
                     (TestRunRequestPayload trp,
                      ITestHostLauncher testHostManager,
-                     ITestRunEventsRegistrar testRunEventsRegistrar) =>
+                     ITestRunEventsRegistrar testRunEventsRegistrar,
+                     ProtocolConfig config) =>
                         {
                             allTasksComplete.Set();
                             receivedTestRunPayload = trp;
-                        });
+                        }
+                    );
 
             this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage())
                 .Returns(getProcessStartInfoMessage)
@@ -175,11 +178,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
                 trm.RunTests(
                     It.IsAny<TestRunRequestPayload>(),
                     It.IsAny<ITestHostLauncher>(),
-                    It.IsAny<ITestRunEventsRegistrar>()))
+                    It.IsAny<ITestRunEventsRegistrar>(),
+                    It.IsAny<ProtocolConfig>()))
                 .Callback(
                     (TestRunRequestPayload trp,
                      ITestHostLauncher testHostManager,
-                     ITestRunEventsRegistrar testRunEventsRegistrar) =>
+                     ITestRunEventsRegistrar testRunEventsRegistrar,
+                     ProtocolConfig config) =>
                     {
                         allTasksComplete.Set();
                         receivedTestRunPayload = trp;
