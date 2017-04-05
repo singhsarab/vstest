@@ -8,6 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     using System.Runtime.Serialization;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using System.Globalization;
 
     /// <summary>
     /// Stores information about a test case.
@@ -23,6 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private Object m_localExtensionData;
 #endif
         private Guid defaultId = Guid.Empty;
+        private Guid id;
 
         #region Constructor
 
@@ -82,16 +84,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                var id = this.GetPropertyValue<Guid>(TestCaseProperties.Id, Guid.Empty);
-                if (id == Guid.Empty)
+                if (this.id == Guid.Empty)
                 {
-                    // user has not specified his own Id during ctor! We will cache Id if its empty
-                    if (this.defaultId == Guid.Empty)
-                    {
-                        this.defaultId = this.GetTestId();
-                    }
-
-                    return this.defaultId;
+                    this.id = this.GetTestId();
                 }
 
                 return id;
@@ -99,7 +94,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             set
             {
-                this.SetLocalPropertyValue(TestCaseProperties.Id, value);
+                this.id = value;
             }
         }
 
@@ -109,18 +104,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [DataMember]
         public string FullyQualifiedName
         {
-            get
-            {
-                return this.GetPropertyValue(TestCaseProperties.FullyQualifiedName, string.Empty);
-            }
-
-            set
-            {
-                this.SetLocalPropertyValue(TestCaseProperties.FullyQualifiedName, value);
-
-                // Id is based on Name/Source, will nulll out guid and it gets calc next time we access it.
-                this.defaultId = Guid.Empty;
-            }
+            get;set;
         }
 
         /// <summary>
@@ -129,15 +113,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [DataMember]
         public string DisplayName
         {
-            get
-            {
-                return this.GetPropertyValue(TestCaseProperties.DisplayName, this.FullyQualifiedName);
-            }
-
-            set
-            {
-                this.SetLocalPropertyValue(TestCaseProperties.DisplayName, value);
-            }
+            get;set;
         }
 
         /// <summary>
@@ -146,15 +122,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [DataMember]
         public Uri ExecutorUri
         {
-            get
-            {
-                return this.GetPropertyValue<Uri>(TestCaseProperties.ExecutorUri, null);
-            }
-
-            set
-            {
-                this.SetLocalPropertyValue(TestCaseProperties.ExecutorUri, value);
-            }
+            get;set;
         }
 
         /// <summary>
@@ -163,18 +131,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [DataMember]
         public string Source
         {
-            get
-            {
-                return this.GetPropertyValue<string>(TestCaseProperties.Source, null);
-            }
-
-            private set
-            {
-                this.SetLocalPropertyValue(TestCaseProperties.Source, value);
-
-                // Id is based on Name/Source, will nulll out guid and it gets calc next time we access it.
-                this.defaultId = Guid.Empty;
-            }
+            get;set;
         }
 
         /// <summary>
@@ -183,15 +140,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [DataMember]
         public string CodeFilePath
         {
-            get
-            {
-                return this.GetPropertyValue<string>(TestCaseProperties.CodeFilePath, null);
-            }
-
-            set
-            {
-                this.SetLocalPropertyValue(TestCaseProperties.CodeFilePath, value);
-            }
+            get;set;
         }
 
         /// <summary>
@@ -200,15 +149,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [DataMember]
         public int LineNumber
         {
-            get
-            {
-                return this.GetPropertyValue(TestCaseProperties.LineNumber, -1);
-            }
-
-            set
-            {
-                this.SetLocalPropertyValue(TestCaseProperties.LineNumber, value);
-            }
+            get;set;
         }
 
         /// <inheritdoc/>
@@ -241,6 +182,62 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             string testcaseFullName = this.ExecutorUri + source + this.FullyQualifiedName;
             return EqtHash.GuidFromString(testcaseFullName);
+        }
+
+        /// <summary>
+        /// Return TestProperty's value
+        /// </summary>
+        /// <returns></returns>
+        internal override object PrivateGetPropertyValue(TestProperty property, object defaultValue)
+        {
+            ValidateArg.NotNull(property, "property");
+
+            switch(property.Id)
+            {
+                case "TestCase.Id":
+                    return this.Id;
+                case "TestCase.ExecutorUri":
+                    return this.ExecutorUri;
+                case "TestCase.FullyQualifiedName":
+                    return this.FullyQualifiedName;
+                case "TestCase.DisplayName":
+                    return this.DisplayName;
+                case "TestCase.Source":
+                    return this.Source;
+                case "TestCase.CodeFilePath":
+                    return this.CodeFilePath;
+                case "TestCase.LineNumber":
+                    return this.LineNumber;
+            }
+
+            return base.PrivateGetPropertyValue(property, defaultValue);
+        }
+
+        /// <summary>
+        /// Set TestProperty's value
+        /// </summary>
+        internal override void PrivateSetPropertyValue(TestProperty property, object value)
+        {
+            ValidateArg.NotNull(property, "property");
+
+            switch (property.Id)
+            {
+                case "TestCase.Id":
+                    this.Id = (Guid)ConvertPropertyFrom<Guid>(property, CultureInfo.InvariantCulture, value); return;
+                case "TestCase.ExecutorUri":
+                    this.ExecutorUri = (Uri)ConvertPropertyFrom<Uri>(property, CultureInfo.InvariantCulture, value); return;
+                case "TestCase.FullyQualifiedName":
+                    this.FullyQualifiedName = (string)ConvertPropertyFrom<string>(property, CultureInfo.InvariantCulture, value); return;
+                case "TestCase.DisplayName":
+                    this.DisplayName = (string)ConvertPropertyFrom<string>(property, CultureInfo.InvariantCulture, value); return;
+                case "TestCase.Source":
+                    this.Source = (string)ConvertPropertyFrom<string>(property, CultureInfo.InvariantCulture, value); return;
+                case "TestCase.CodeFilePath":
+                    this.CodeFilePath = (string)ConvertPropertyFrom<string>(property, CultureInfo.InvariantCulture, value); return;
+                case "TestCase.LineNumber":
+                    this.LineNumber = (int)ConvertPropertyFrom<string>(property, CultureInfo.InvariantCulture, value); return;
+            }
+            base.PrivateSetPropertyValue(property, value);
         }
 
         #endregion

@@ -64,15 +64,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [DataMember]
         public TestOutcome Outcome
         {
-            get
-            {
-                return this.GetPropertyValue(TestResultProperties.Outcome, TestOutcome.None);
-            }
-
-            set
-            {
-                this.SetLocalPropertyValue(TestResultProperties.Outcome, value);
-            }
+            get;set;
         }
 
         /// <summary>
@@ -81,15 +73,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [DataMember]
         public string ErrorMessage
         {
-            get
-            {
-                return this.GetPropertyValue<string>(TestResultProperties.ErrorMessage, null);
-            }
-
-            set
-            {
-                this.SetLocalPropertyValue(TestResultProperties.ErrorMessage, value);
-            }
+            get;set;
         }
 
         /// <summary>
@@ -98,15 +82,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [DataMember]
         public string ErrorStackTrace
         {
-            get
-            {
-                return this.GetPropertyValue<string>(TestResultProperties.ErrorStackTrace, null);
-            }
-
-            set
-            {
-                this.SetLocalPropertyValue(TestResultProperties.ErrorStackTrace, value);
-            }
+            get;set;
         }
 
         /// <summary>
@@ -115,15 +91,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [DataMember]
         public string DisplayName
         {
-            get
-            {
-                return this.GetPropertyValue<string>(TestResultProperties.DisplayName, null);
-            }
-
-            set
-            {
-                this.SetLocalPropertyValue(TestResultProperties.DisplayName, value);
-            }
+            get;set;
         }
 
         /// <summary>
@@ -142,15 +110,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [DataMember]
         public string ComputerName
         {
-            get
-            {
-                return this.GetPropertyValue(TestResultProperties.ComputerName, string.Empty);
-            }
-
-            set
-            {
-                this.SetLocalPropertyValue(TestResultProperties.ComputerName, value);
-            }
+            get;set;
         }
 
         /// <summary>
@@ -159,15 +119,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [DataMember]
         public TimeSpan Duration
         {
-            get
-            {
-                return this.GetPropertyValue(TestResultProperties.Duration, TimeSpan.Zero);
-            }
-
-            set
-            {
-                this.SetLocalPropertyValue(TestResultProperties.Duration, value);
-            }
+            get;set;
         }
 
         /// <summary>
@@ -176,15 +128,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [DataMember]
         public DateTimeOffset StartTime
         {
-            get
-            {
-                return this.GetPropertyValue(TestResultProperties.StartTime, DateTimeOffset.Now);
-            }
-
-            set
-            {
-                this.SetLocalPropertyValue(TestResultProperties.StartTime, value);
-            }
+            get;set;
         }
 
         /// <summary>
@@ -193,22 +137,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [DataMember]
         public DateTimeOffset EndTime
         {
-            get
-            {
-                return this.GetPropertyValue(TestResultProperties.EndTime, DateTimeOffset.Now);
-            }
-
-            set
-            {
-                this.SetLocalPropertyValue(TestResultProperties.EndTime, value);
-            }
+            get;set;
         }
 
         #endregion
 
         #region Methods
-
-
+        
         /// <inheritdoc/>
         public override string ToString()
         {
@@ -263,6 +198,66 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
 
             return result.ToString();
+        }
+
+        /// <summary>
+        /// Return TestProperty's value
+        /// </summary>
+        /// <returns></returns>
+        internal override object PrivateGetPropertyValue(TestProperty property, object defaultValue)
+        {
+            ValidateArg.NotNull(property, "property");
+
+            switch (property.Id)
+            {
+                case "TestResult.DisplayName":
+                    return this.DisplayName;
+                case "TestResult.ComputerName":
+                    return this.ComputerName;
+                case "TestResult.Outcome":
+                    return this.Outcome;
+                case "TestResult.Duration":
+                    return this.Duration;
+                case "TestResult.CodeFilePath":
+                    return this.StartTime;
+                case "TestResult.EndTime":
+                    return this.EndTime;
+                case "TestResult.ErrorMessage":
+                    return this.ErrorMessage;
+                case "TestResult.ErrorStackTrace":
+                    return this.ErrorStackTrace;
+            }
+
+            return base.PrivateGetPropertyValue(property, defaultValue);
+        }
+
+        /// <summary>
+        /// Set TestProperty's value
+        /// </summary>
+        internal override void PrivateSetPropertyValue(TestProperty property, object value)
+        {
+            ValidateArg.NotNull(property, "property");
+
+            switch (property.Id)
+            {
+                case "TestResult.DisplayName":
+                    this.DisplayName = (string)value; return;
+                case "TestResult.ComputerName":
+                    this.ComputerName = (string)value; return;
+                case "TestResult.Outcome":
+                    this.Outcome = (TestOutcome)value; return;
+                case "TestResult.Duration":
+                    this.Duration = (TimeSpan)value; return;
+                case "TestResult.StartTime":
+                    this.StartTime = (DateTimeOffset)value; return;
+                case "TestResult.EndTime":
+                    this.EndTime = (DateTimeOffset)value; return;
+                case "TestResult.ErrorMessage":
+                    this.ErrorMessage = (string)value; return;
+                case "TestResult.ErrorStackTrace":
+                    this.ErrorStackTrace = (string)value; return;
+            }
+            base.PrivateSetPropertyValue(property, value);
         }
 
         #endregion
