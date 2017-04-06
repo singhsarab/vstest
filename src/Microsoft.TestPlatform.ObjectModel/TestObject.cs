@@ -1,4 +1,4 @@
-﻿﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
@@ -27,11 +27,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// The store for all the properties registered.
         /// </summary>
         private readonly Dictionary<TestProperty, object> store;
-
-        /// <summary>
-        /// The store for all the local properties registered.
-        /// </summary>
-        private readonly Dictionary<TestProperty, object> localStore;
 
         /// <summary>
         /// Property used for Json (de)serialization of store dictionary. Serialization of dictionaries
@@ -69,13 +64,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
         }
 
-        /// <summary>
-        /// Returns the list of testproperties associated with the test object
-        /// </summary>
-        /// <returns></returns>
-        public List<KeyValuePair<TestProperty, object>> GetProperties()
+        public IEnumerable<KeyValuePair<TestProperty, object>> GetProperties()
         {
-            return this.store.Concat(this.localStore).ToList();
+            return this.store;
         }
 
         #endregion Fields
@@ -85,7 +76,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         protected TestObject()
         {
             this.store = new Dictionary<TestProperty, object>();
-            this.localStore = new Dictionary<TestProperty, object>();
         }
 
         [OnSerializing]
@@ -119,7 +109,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         public IEnumerable<TestProperty> Properties
         {
-            get { return this.store.Keys.Concat(this.localStore.Keys); }
+            get { return this.store.Keys; }
         }
 
         /// <summary>
@@ -183,7 +173,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="value">value to be set</param>
         public void SetPropertyValue(TestProperty property, object value)
         {
-            this.PrivateSetPropertyValue(property, value, this.store);
+            this.PrivateSetPropertyValue(property, value);
         }
 
         /// <summary>
@@ -226,7 +216,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             object objValue = ConvertPropertyFrom<T>(property, culture, value);
 
-            this.PrivateSetPropertyValue(property, objValue, this.store);
+            this.PrivateSetPropertyValue(property, objValue);
         }
 
         /// <summary>
@@ -239,18 +229,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             object objValue = ConvertPropertyFrom<T>(property, culture, value);
 
-            this.PrivateSetPropertyValue(property, objValue, this.store);
-        }
-
-        /// <summary>
-        /// Set TestProperty's value to the specified value T.
-        /// </summary>
-        protected void SetLocalPropertyValue<T>(TestProperty property, T value)
-        {
-            ValidateArg.NotNull(property, "property");
-
-            object objValue = ConvertPropertyFrom<T>(property, CultureInfo.InvariantCulture, value);
-            this.PrivateSetPropertyValue(property, objValue, this.localStore);
+            this.PrivateSetPropertyValue(property, objValue);
         }
 
         #endregion Property Values
@@ -261,12 +240,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// Return TestProperty's value
         /// </summary>
         /// <returns></returns>
-        private object PrivateGetPropertyValue(TestProperty property, object defaultValue)
+        internal virtual object PrivateGetPropertyValue(TestProperty property, object defaultValue)
         {
             ValidateArg.NotNull(property, "property");
 
             object value;
-            if (!this.store.TryGetValue(property, out value) && !this.localStore.TryGetValue(property, out value))
+            if (!this.store.TryGetValue(property, out value))
             {
                 value = defaultValue;
             }
@@ -277,13 +256,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Set TestProperty's value
         /// </summary>
-        private void PrivateSetPropertyValue(TestProperty property, object value, Dictionary<TestProperty, object> dictionary)
+        internal virtual void PrivateSetPropertyValue(TestProperty property, object value)
         {
             ValidateArg.NotNull(property, "property");
 
             if (property.ValidateValueCallback == null || property.ValidateValueCallback(value))
             {
-                dictionary[property] = value;
+                this.store[property] = value;
             }
             else
             {
@@ -407,5 +386,5 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 return this.traits;
             }
         }
-    } 
+    }
 }
