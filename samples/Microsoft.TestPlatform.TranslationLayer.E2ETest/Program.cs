@@ -19,18 +19,27 @@ namespace Microsoft.TestPlatform.TranslationLayer.E2ETest
 
     public class Program
     {
+        static string framework = "FrameworkCore10";
+        static string settingsXml =
+                      @"<?xml version=""1.0"" encoding=""utf-8""?>
+                        <RunSettings>
+                             <RunConfiguration>
+                              <TargetFrameworkVersion>" + framework + @"</TargetFrameworkVersion>
+                             </RunConfiguration>
+                        </RunSettings>";
+
         public static void Main(string[] args)
         {
             // Spawn of vstest.console with a run tests from the current execting folder.
             var executingLocation = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
             var runnerLocation = Path.Combine(executingLocation, "vstest.console.exe");
             var testadapterPath = Path.Combine(executingLocation, "Adapter\\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll");
-            var testAssembly = Path.Combine(executingLocation, "UnitTestProject.dll");
+            var testAssembly = @"D:\Code\vstest\samples\UnitTestProject\bin\Debug\netcoreapp1.0\UnitTestProject.dll"; //Path.Combine(executingLocation, "UnitTestProject.dll");
 
             IVsTestConsoleWrapper consoleWrapper = new VsTestConsoleWrapper(runnerLocation);
 
             consoleWrapper.StartSession();
-            consoleWrapper.InitializeExtensions(new List<string>() { testadapterPath });
+            //consoleWrapper.InitializeExtensions(new List<string>() { testadapterPath });
 
             var testCases = DiscoverTests(new List<string>() { testAssembly }, consoleWrapper);
             Console.WriteLine("Discovered Tests Count: " + testCases?.Count());
@@ -95,7 +104,7 @@ namespace Microsoft.TestPlatform.TranslationLayer.E2ETest
             var runCompleteSignal = new AutoResetEvent(false);
             var processExitedSignal = new AutoResetEvent(false);
             var handler = new RunEventHandler(runCompleteSignal);
-            consoleWrapper.RunTestsWithCustomTestHost(list, String.Empty, handler, new CustomTestHostLauncher(() => processExitedSignal.Set()));
+            consoleWrapper.RunTestsWithCustomTestHost(list, settingsXml, handler, new CustomTestHostLauncher(() => processExitedSignal.Set()));
 
             // Test host exited signal comes after the run complete
             processExitedSignal.WaitOne();
