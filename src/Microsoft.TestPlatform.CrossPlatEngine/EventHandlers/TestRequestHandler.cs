@@ -10,6 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandlers;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -21,10 +22,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     using CrossPlatResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+    using System.Linq;
+
+    using System.Runtime.Serialization;
+    using System.Xml;
 
     /// <summary>
     /// Utility class to fecilitate the IPC comunication. Acts as Client.
     /// </summary>
+#if NET451
+    [Serializable]
+#endif
     public class TestRequestHandler : IDisposable, ITestRequestHandler
     {
         private ICommunicationManager communicationManager;
@@ -41,6 +49,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         // that implies runner is using version 1
         private int protocolVersion = 1;
 
+        private ITestRequestProxy testRequestProxy;
+
         public TestRequestHandler(TestHostConnectionInfo connectionInfo)
             : this(new SocketCommunicationManager(), connectionInfo, JsonDataSerializer.Instance)
         {
@@ -51,6 +61,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.communicationManager = communicationManager;
             this.transport = new SocketTransport(communicationManager, connectionInfo);
             this.dataSerializer = dataSerializer;
+            this.testRequestProxy = new TestRequestProxy();
+            this.testRequestProxy.OnRawMessageReceived += TestRequestProxy_OnRawMessageReceived;
+        }
+        
+        private void TestRequestProxy_OnRawMessageReceived(object sender, string e)
+        {
+            this.communicationManager.SendRawMessage(e);
         }
 
         /// <inheritdoc/>
@@ -143,20 +160,60 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     case MessageType.StartTestExecutionWithSources:
                         {
                             EqtTrace.Info("Execution started.");
-                            var testRunEventsHandler = new TestRunEventsHandler(this);
+                            //var testRunEventsHandler = new TestRunEventsHandler(this);
 
                             var testRunCriteriaWithSources = this.dataSerializer.DeserializePayload<TestRunCriteriaWithSources>(message);
-                            jobQueue.QueueJob(
-                                () =>
-                                testHostManagerFactory.GetExecutionManager()
-                                    .StartTestRun(
-                                        testRunCriteriaWithSources.AdapterSourceMap,
-                                        testRunCriteriaWithSources.RunSettings,
-                                        testRunCriteriaWithSources.TestExecutionContext,
-                                        this.GetTestCaseEventsHandler(testRunCriteriaWithSources.RunSettings),
-                                        testRunEventsHandler),
-                                0);
+                            
+                            var runsettings = testRunCriteriaWithSources.RunSettings;
+                            var doc = new XmlDocument();
+                            doc.LoadXml(runsettings);
+                            var navigator = doc.CreateNavigator();
+                            navigator.MoveToFirstChild();
+                            InferRunSettingsHelper.UpdateDisableAppDomain(navigator, true);
+                            
+                            // Add disable app domain
 
+                            IEnumerable<string> sources = new List<string>();
+                            var sourcesArray = testRunCriteriaWithSources.AdapterSourceMap.Values.Aggregate(sources, (current, enumerable) => current.Concat(enumerable)).ToArray();
+                            (testRequestProxy as TestRequestProxy).SourceCount = sourcesArray.Length;
+                            foreach (var source in sourcesArray)
+                            {
+                                Dictionary<string, IEnumerable<string>> sourceMap = new Dictionary<string, IEnumerable<string>>();
+                                sourceMap.Add("_none_", new List<string>() { source });
+
+//#if NET451
+//                                // Create a new app domain to run the tests
+//                                var factory =  new AppDomainTestHostManagerFactory<TestHostManagerFactory>(source);
+//#else
+//                                var factory = testHostManagerFactory;
+//#endif
+                                // Initialize Extensions here
+                                var pathToAdditionalExtensions = new List<string>() { @"C:\Users\sasin\Source\Repos\UnitTestProject3\UnitTestProject3\bin\Debug\net46\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll" };
+                                
+#if NET451
+                                // Create a new app domain to run the tests
+                                var invoker = new AppDomainTestInvoker<TestInvoker>(source);
+#else
+                                var invoker = new TestInvoker();
+#endif
+                                
+                                jobQueue.QueueJob(
+                                   () =>
+                                //    {
+                                //        factory.GetExecutionManager().Initialize(pathToAdditionalExtensions);
+
+                                //        factory.GetExecutionManager()
+                                //          .StartTestRun(
+                                //              sourceMap,
+                                //              runsettings,
+                                //              testRunCriteriaWithSources.TestExecutionContext,
+                                //              this.GetTestCaseEventsHandler(runsettings),
+                                //              testRunEventsHandler);
+                                //    },
+                                invoker.InvokeRun(pathToAdditionalExtensions, sourceMap, runsettings, testRunCriteriaWithSources.TestExecutionContext, this.testRequestProxy),
+                                0);
+                            
+                            }
                             break;
                         }
 
@@ -312,6 +369,32 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             }
 
             return testCaseEventsHandler;
+        }
+    }
+    
+    public class TestRequestProxy :
+#if NET451
+        MarshalByRefObject,
+#endif
+        ITestRequestProxy
+    {
+        private int completedSources;
+        public event EventHandler<string> OnRawMessageReceived;
+        
+        public void SendRawMessage(string message)
+        {
+            this.OnRawMessageReceived?.Invoke(this, message);
+        }
+
+        public int SourceCount { get; set; }
+        
+        public void SendComplete(string message)
+        {
+            completedSources++;
+            if(completedSources == SourceCount)
+            {
+                this.OnRawMessageReceived?.Invoke(this, message);
+            }
         }
     }
 }

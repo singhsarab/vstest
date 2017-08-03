@@ -10,9 +10,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol
     /// Stores information about test execution context.
     /// </summary>
     [DataContract]
+#if NET451
+    [Serializable]
+#endif
     public class TestExecutionContext
     {
-        #region Constructors
+#region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestExecutionContext"/> class.
@@ -59,9 +62,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol
             this.TestCaseFilter = testCaseFilter;
         }
 
-        #endregion
+#endregion
 
-        #region Properties
+#region Properties
 
         /// <summary>
         /// Gets or sets the frequency of run stats event.
@@ -165,6 +168,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol
             set;
         }
 
-        #endregion
+#endregion
     }
 }

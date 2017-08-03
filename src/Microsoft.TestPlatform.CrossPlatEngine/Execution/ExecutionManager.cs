@@ -5,7 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 {
     using System;
     using System.Collections.Generic;
-
+    using System.Runtime.Serialization;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
@@ -19,6 +19,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     /// <summary>
     /// Orchestrates test execution related functionality for the engine communicating with the test host process.
     /// </summary>
+#if NET451
+    [Serializable]
+#endif
     public class ExecutionManager : IExecutionManager
     {
         private ITestRunEventsHandler testRunEventsHandler;

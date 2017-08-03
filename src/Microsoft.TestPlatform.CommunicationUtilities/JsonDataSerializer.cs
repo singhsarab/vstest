@@ -3,18 +3,19 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 {
+    using System;
     using System.IO;
-
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
-
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
-    using Newtonsoft.Json.Serialization;
 
     /// <summary>
     /// JsonDataSerializes serializes and deserializes data using Json format
     /// </summary>
+#if NET451
+    [Serializable]
+#endif
     public class JsonDataSerializer : IDataSerializer
     {
         private static JsonDataSerializer instance;

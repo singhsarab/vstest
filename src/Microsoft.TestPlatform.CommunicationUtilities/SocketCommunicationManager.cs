@@ -8,15 +8,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using System.IO;
     using System.Net;
     using System.Net.Sockets;
+    using System.Runtime.Serialization;
     using System.Threading;
     using System.Threading.Tasks;
-
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>
     /// Facilitates communication using sockets
     /// </summary>
+#if NET451
+    [Serializable]
+#endif
     public class SocketCommunicationManager : ICommunicationManager
     {
         /// <summary>

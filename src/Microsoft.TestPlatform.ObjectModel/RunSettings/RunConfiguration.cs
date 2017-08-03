@@ -8,12 +8,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     using System.Globalization;
     using System.IO;
     using System.Xml;
-
+    using System.Runtime.Serialization;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
     /// <summary>
     /// Stores information about a test settings.
     /// </summary>
+#if NET451
+    [Serializable]
+#endif
     public class RunConfiguration : TestRunSettings
     {
         #region private fields

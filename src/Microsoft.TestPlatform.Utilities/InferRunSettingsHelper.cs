@@ -27,6 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         private const string TargetFrameworkNodeName = "TargetFrameworkVersion";
 
         private const string DesignModeNodePath = @"/RunSettings/RunConfiguration/DesignMode";
+        private const string DisableAppDomainNodePath = @"/RunSettings/RunConfiguration/DisableAppDomain";
         private const string CollectSourceInformationNodePath = @"/RunSettings/RunConfiguration/CollectSourceInformation";
         private const string RunConfigurationNodePath = @"/RunSettings/RunConfiguration";
         private const string TargetPlatformNodePath = @"/RunSettings/RunConfiguration/TargetPlatform";
@@ -90,6 +91,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         public static void UpdateDesignMode(XPathNavigator runSettingsNavigator, bool designModeValue)
         {
             AddNodeIfNotPresent<bool>(runSettingsNavigator, DesignModeNodePath, DesignModeNodeName, designModeValue);            
+        }
+
+        public static void UpdateDisableAppDomain(XPathNavigator runSettingsNavigator, bool disableAppDomain)
+        {
+            AddNodeIfNotPresent<bool>(runSettingsNavigator, DisableAppDomainNodePath, DisableAppDomainNodePath, disableAppDomain);
         }
 
         /// <summary>

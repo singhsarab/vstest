@@ -5,11 +5,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 {
     using System;
     using System.Net;
-
+    using System.Runtime.Serialization;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <inheritdoc/>
+#if NET451
+    [Serializable]
+#endif
     public sealed class SocketTransport : ITransport
     {
         /// <summary>

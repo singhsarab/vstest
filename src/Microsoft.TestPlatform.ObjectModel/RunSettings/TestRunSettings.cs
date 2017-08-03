@@ -3,11 +3,16 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
+    using System;
+    using System.Runtime.Serialization;
     using System.Xml;
 
     /// <summary>
     /// Stores information about a test settings.
     /// </summary>
+#if NET451
+    [Serializable]
+#endif
     public abstract class TestRunSettings
     {
         private string name;
