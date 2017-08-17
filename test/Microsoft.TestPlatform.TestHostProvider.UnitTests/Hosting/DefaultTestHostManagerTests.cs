@@ -20,6 +20,8 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
 
@@ -30,6 +32,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         private readonly TestProcessStartInfo startInfo;
         private readonly Mock<IMessageLogger> mockMessageLogger;
         private readonly Mock<IProcessHelper> mockProcessHelper;
+        private readonly Mock<IFileHelper> mockFileHelper;
         private readonly Mock<IDotnetHostHelper> mockDotnetHostHelper;
         private readonly Mock<IEnvironment> mockEnvironment;
 
@@ -43,13 +46,14 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         public DefaultTestHostManagerTests()
         {
             this.mockProcessHelper = new Mock<IProcessHelper>();
+            this.mockFileHelper = new Mock<IFileHelper>();
             this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("vstest.console.exe");
             this.mockDotnetHostHelper = new Mock<IDotnetHostHelper>();
             this.mockEnvironment = new Mock<IEnvironment>();
 
             this.mockMessageLogger = new Mock<IMessageLogger>();
 
-            this.testHostManager = new DefaultTestHostManager(this.mockProcessHelper.Object, this.mockEnvironment.Object, this.mockDotnetHostHelper.Object);
+            this.testHostManager = new DefaultTestHostManager(this.mockProcessHelper.Object, this.mockFileHelper.Object, this.mockEnvironment.Object, this.mockDotnetHostHelper.Object);
             this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration> <TargetPlatform>{Architecture.X64}</TargetPlatform> <TargetFrameworkVersion>{Framework.DefaultFramework}</TargetFrameworkVersion> <DisableAppDomain>{false}</DisableAppDomain> </RunConfiguration> </RunSettings>");
             this.startInfo = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default(TestRunnerConnectionInfo));
         }
@@ -437,7 +441,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                 bool shared,
                 int errorLength,
                 IMessageLogger logger)
-                : base(processHelper, new PlatformEnvironment(), new DotnetHostHelper())
+                : base(processHelper, new FileHelper(), new PlatformEnvironment(), new DotnetHostHelper())
             {
                 this.ErrorLength = errorLength;
                 this.Initialize(logger, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration> <TargetPlatform>{architecture}</TargetPlatform> <TargetFrameworkVersion>{framework}</TargetFrameworkVersion> <DisableAppDomain>{!shared}</DisableAppDomain> </RunConfiguration> </RunSettings>");
