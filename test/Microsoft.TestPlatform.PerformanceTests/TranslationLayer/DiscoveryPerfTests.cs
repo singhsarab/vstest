@@ -3,109 +3,60 @@
 
 namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
 {
-    using Microsoft.ApplicationInsights;
-    using Microsoft.ApplicationInsights.Extensibility;
-    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System.Collections.Generic;
-    using System.IO;
-    using System.Reflection;
 
     [TestClass]
-    public class DiscoveryPerfTests
+    public class DiscoveryPerfTests : TelemetryPerfTestbase
     {
         private IVsTestConsoleWrapper vstestConsoleWrapper;
         private DiscoveryEventHandler2 discoveryEventHandler2;
-        private DirectoryInfo currentDirectory = new DirectoryInfo(typeof(DiscoveryPerfTests).GetTypeInfo().Assembly.GetAssemblyLocation()).Parent;
-
-        public void Setup()
+        
+        public DiscoveryPerfTests()
         {
             this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper();
             this.discoveryEventHandler2 = new DiscoveryEventHandler2();
         }
 
         [TestMethod]
-        public void Discover10KTests()
+        public void DiscoverMsTest10K()
         {
             var testAssemblies = new List<string>
                                      {
-                                         this.GetPerfAssetFullPath("MSTestAdapterPerfTestProject.dll"),
+                                         GetPerfAssetFullPath("MSTestAdapterPerfTestProject", "MSTestAdapterPerfTestProject.dll"),
                                      };
 
-            this.Setup();
             this.vstestConsoleWrapper.DiscoverTests(testAssemblies, this.GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, this.discoveryEventHandler2);
-          
-            TelemetryClient client = new TelemetryClient();
-            TelemetryConfiguration.Active.InstrumentationKey = "76b373ba-8a55-45dd-b6db-7f1a83288691";
-            //client.InstrumentationKey = "76b373ba-8a55-45dd-b6db-7f1a83288691";
-            Dictionary<string, string> properties = new Dictionary<string, string>();
-            Dictionary<string, double> metrics = new Dictionary<string, double>();
 
-            foreach(var entry in this.discoveryEventHandler2.Metrics)
-            {
-                var stringValue = entry.Value.ToString();
-                if (double.TryParse(stringValue, out var doubleValue))
-                {
-                    metrics.Add(entry.Key, doubleValue);
-                }
-                else
-                {
-                    properties.Add(entry.Key, stringValue);
-                }
-            }
-
-            client.TrackEvent("DiscoveryMsTest10K", properties, metrics);
-            client.Flush();
+            this.PostTelemetry("DiscoveryMsTest10K", this.discoveryEventHandler2.Metrics);
         }
 
-        private string GetPerfAssetFullPath(string dllName)
+        [TestMethod]
+        public void DiscoverXunit10K()
         {
-            return Path.Combine(currentDirectory.FullName, "TestAssets\\PerfAssets", dllName);
+            var testAssemblies = new List<string>
+                                     {
+                                         GetPerfAssetFullPath("XunitAdapterPerfTestProject", "XunitAdapterPerfTestProject.dll"),
+                                     };
+
+            this.vstestConsoleWrapper.DiscoverTests(testAssemblies, this.GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, this.discoveryEventHandler2);
+
+            this.PostTelemetry("DiscoverXunit10K", this.discoveryEventHandler2.Metrics);
         }
 
-        /// <summary>
-        /// Returns the VsTestConsole Wrapper.
-        /// </summary>
-        /// <returns></returns>
-        public IVsTestConsoleWrapper GetVsTestConsoleWrapper()
+        [TestMethod]
+        public void DiscoverNunit10K()
         {
-            var vstestConsoleWrapper = new VsTestConsoleWrapper(this.GetConsoleRunnerPath());
-            vstestConsoleWrapper.StartSession();
+            var testAssemblies = new List<string>
+                                     {
+                                         GetPerfAssetFullPath("NunitAdapterPerfTestProject", "NunitAdapterPerfTestProject.dll"),
+                                     };
 
-            return vstestConsoleWrapper;
-        }
-        public static string BuildConfiguration
-        {
-            get
-            {
-#if DEBUG
-                return "Debug";
-#else
-                return "Release";
-#endif
-            }
-        }
+            this.vstestConsoleWrapper.DiscoverTests(testAssemblies, this.GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, this.discoveryEventHandler2);
 
-        private string GetConsoleRunnerPath()
-        {
-            // Find the root
-            var root = currentDirectory.Parent.Parent.Parent;
-            // Path to artifacts vstest.console
-            return Path.Combine(root.FullName, "artifacts", BuildConfiguration, "net451", "win7-x64", "vstest.console.exe");
-        }
-
-        public string GetDefaultRunSettings()
-        {
-            string runSettingsXml = $@"<?xml version=""1.0"" encoding=""utf-8""?>
-                                    <RunSettings>
-                                        <RunConfiguration>
-                                        <TargetFrameworkVersion>Framework45</TargetFrameworkVersion>
-                                        </RunConfiguration>
-                                    </RunSettings>";
-            return runSettingsXml;
+            this.PostTelemetry("DiscoverNunit10K", this.discoveryEventHandler2.Metrics);
         }
     }
 }
