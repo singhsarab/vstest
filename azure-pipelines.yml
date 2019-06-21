@@ -70,6 +70,6 @@ jobs:
   variables:
       buildConfiguration: 'Release'
   steps:
-  - script: ./build.sh -c $(buildConfiguration)
+  - script: ./build.sh -DotNetBuildFromSource -c Release
     displayName: './build.sh -c $(buildConfiguration)'
    
